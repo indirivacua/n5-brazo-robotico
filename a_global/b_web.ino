@@ -1,6 +1,8 @@
-const char *ssid = "Brazo robótico";
+const char *ssid = "Robotic arm";
 const char *pwd = "1234";
 const int mc = 1;
+
+boolean armAvailable = false;
 
 void handleRoot(){
   server.send(200, "text/html", "<h1>Reply from ESP8266</h1>");
@@ -14,13 +16,18 @@ void handleDraw(){
 }
 
 void handleAvailable(){
+  if(armAvailable) server.send(200, "text/html", "true");
+  else server.send(200, "text/html", "false");
 }
 
 
 void web_init(){
   //WiFi.softAP(ssid,pwd,1,false,mc);
   WiFi.softAP(ssid);
+  
   server.on("/", handleRoot);
   server.onNotFound(handleNotFound);
+  server.on("/available",handleAvailable);
+  
   server.begin();
 }
