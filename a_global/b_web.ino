@@ -20,6 +20,11 @@ void handleAvailable(){
   else server.send(200, "text/html", "false");
 }
 
+void handleDimensions(){
+  String msg = "x:";
+  msg+=String(dimX) + ",y:"+String(dimY);
+  server.send(200, "text/html", msg);
+}
 
 void web_init(){
   //WiFi.softAP(ssid,pwd,1,false,mc);
@@ -27,7 +32,9 @@ void web_init(){
   
   server.on("/", handleRoot);
   server.onNotFound(handleNotFound);
+  
   server.on("/available",handleAvailable);
+  server.on("/dimensions",handleDimensions);
   
   server.begin();
 }
