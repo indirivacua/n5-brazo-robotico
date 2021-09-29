@@ -7,6 +7,7 @@ void handleRoot(){
 }
 
 void handleNotFound(){
+  server.send(200, "text/html", "<h1>404: Not Found</h1>");
 }
 
 void handleDraw(){
@@ -20,5 +21,6 @@ void web_init(){
   //WiFi.softAP(ssid,pwd,1,false,mc);
   WiFi.softAP(ssid);
   server.on("/", handleRoot);
+  server.onNotFound(handleNotFound);
   server.begin();
 }
