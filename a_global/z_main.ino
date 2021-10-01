@@ -6,7 +6,7 @@ void setup(){
   //Inicializar comunicación wifi y servidor web
   web_init();
 
-  //Indicar que el brazo se encuentra disponiblel
+  //Indicar que el brazo se encuentra disponible luego de inicializar todo
   armAvailable = true;
 }
 
