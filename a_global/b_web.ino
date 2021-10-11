@@ -47,6 +47,7 @@ void handleDraw(){
       {
         msg="Dibujando";
         //Dibujar triangulo
+        armAvailable = false;
       }
     }
     else if(server.arg(2) == "square"){
@@ -56,6 +57,7 @@ void handleDraw(){
       {
         msg="Dibujando";
         //Dibujar cuadrado
+        armAvailable = false;
       }
     }
     else if(server.arg(2) == "circle"){
@@ -65,6 +67,7 @@ void handleDraw(){
       {
         msg="Dibujando";
         //Dibujar círculo
+        armAvailable = false;
       }
     }
     else msg = "La figura indicada no existe";

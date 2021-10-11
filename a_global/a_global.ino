@@ -12,4 +12,4 @@ int dimX = 100;
 int dimY = 200;
 
 //Estado del brazo
-boolean armAvailable = false;
+boolean armAvailable = true;
