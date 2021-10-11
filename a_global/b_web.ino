@@ -34,6 +34,8 @@ void handleDraw(){
   else if(server.args() < 4) msg = "Parámetros insuficientes";
   //Chequear nombres de los parámetros
   else if(!(server.argName(0) == "posX" && server.argName(1) == "posY" && server.argName(2) == "shape" && server.argName(3) == "size")) msg = "Parámetros incorrectos";
+  //Chequear que el tamaño no sea 0
+  else if(server.arg(3).toInt() == 0) msg = "El tamaño no puede ser 0";
   //Chequear si la figura es válida y si el dibujo entra en la hoja, si es así dibujarla
   else{
     x=server.arg(0).toInt();
@@ -46,8 +48,8 @@ void handleDraw(){
       else
       {
         msg="Dibujando";
+        armAvailable = false; //Indicar que el brazo está ocupado
         //Dibujar triangulo
-        armAvailable = false;
       }
     }
     else if(server.arg(2) == "square"){
@@ -55,9 +57,9 @@ void handleDraw(){
       if(CHECKSIZE) msg = "Espacio insuficiente";
       else
       {
+        armAvailable = false; //Indicar que el brazo está ocupado
         msg="Dibujando";
         //Dibujar cuadrado
-        armAvailable = false;
       }
     }
     else if(server.arg(2) == "circle"){
@@ -65,9 +67,9 @@ void handleDraw(){
       if(CHECKSIZE) msg = "Espacio insuficiente";
       else
       {
+        armAvailable = false; //Indicar que el brazo está ocupado
         msg="Dibujando";
         //Dibujar círculo
-        armAvailable = false;
       }
     }
     else msg = "La figura indicada no existe";
