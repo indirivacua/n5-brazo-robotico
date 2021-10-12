@@ -4,8 +4,6 @@
 
 //Parámetros de la red wifi
 const char *ssid = "Robotic arm"; //Id
-const char *pwd = "1234";         //Contraseña
-const int mc = 1;                 //Máxima cantidad de conexiones
 
 //Handlers para requests
 //Root: ruta raiz, usada para testeos
@@ -94,8 +92,7 @@ void handleDimensions(){
 
 //Inicializar la comunicación wifi y el servidor web 
 void web_init(){
-  //WiFi.softAP(ssid,pwd,1,false,mc);
-  //Activar wifi
+  //Levantar red wifi
   WiFi.softAP(ssid);
 
   //linkear handlers con sus rutas
