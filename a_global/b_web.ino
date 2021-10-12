@@ -1,5 +1,6 @@
 //Manejo del ESP8266 para comunicación wifi y servidor web de este
 
+//Macro para calcular el tamaño
 #define CHECKSIZE (x+h2 > dimX) || (x-h2 < 0) || (y+h2 > dimY) || (y-h2 < 0)
 
 //Parámetros de la red wifi
