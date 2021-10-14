@@ -1,0 +1,51 @@
+{% extends "_base.html" %}
+
+{% block title %}
+BRD - Registrarse
+{% endblock %}
+
+{% block content %}
+
+<br>
+<div class="container text-center">
+    <h3 class="text-center form-group">REGISTRO</h3>
+    <br>
+    <form method="POST" class="form-register" align="center">
+        {{ form.hidden_tag() }}
+        <div class="row">
+            <div class="col-3 offset-3">
+                Email
+                {{ form.email(class="form-control", placeholder="email@ejemplo.com") }}
+                <small id="password_help" class="form-text text-muted"> Ingrese un email válido.</small>
+            </div>
+            <div class="col-3" align="center">
+                Usuario
+                {{ form.username(class="form-control", placeholder="Ingresar nombre de usuario") }}
+                <small id="password_help" class="form-text text-muted"> Entre 2 a 15 caracteres.</small>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-3 offset-3" align="center">
+                Contraseña
+                {{ form.password_ok(class="form-control", placeholder="Ingresar contraseña") }}
+                <small id="password_help" class="form-text text-muted"> Mínimo 8 caracteres.</small>
+            </div>
+            <div class="col-3" align="center">
+                Confirmar contraseña
+                {{ form.password_ch(class="form-control", placeholder="Confirmar contraseña") }}
+                <small id="password_help" class="form-text text-muted"> Mínimo 8 caracteres.</small>
+            </div>
+        </div>
+        <br>
+        {{ form.submit(class="btn btn-primary") }}
+    </form>
+
+    <br>
+    <p>¿Ya dispone de una cuenta?</p>
+    <a href="{{ url_for('login_page') }}" class="btn btn-secondary btn-sm">Iniciar Sesión</a>
+
+</div>
+
+{% endblock %}
+
