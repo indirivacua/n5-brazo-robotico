@@ -1,0 +1,35 @@
+{% extends "_base.html" %}
+
+{% block title %}
+BRD - Iniciar Sesión
+{% endblock %}
+
+{% block content %}
+
+<br>
+<div class="container text-center">
+    <h3 class="text-center form-group">INICIAR SESIÓN</h3>
+    <br>
+    <form method="POST" class="form-register">
+        {{ form.hidden_tag() }}
+        <div class="col-md-4 offset-md-4" align="center">
+            Usuario
+            {{ form.username(class="form-control", placeholder="Ingresar nombre de usuario") }}
+        </div>
+        <br>
+        <div class="col-md-4 offset-md-4" align="center">
+            Contraseña
+            {{ form.password(class="form-control", placeholder="Ingresar contraseña") }}
+        </div>
+        <br>
+        {{ form.submit(class="btn btn-primary") }}
+    </form>
+
+    <br>
+    <p>¿No dispone de una cuenta?</p>
+    <a href="{{ url_for('register_page') }}" class="btn btn-secondary btn-sm">Registrarse</a>
+
+</div>
+
+{% endblock %}
+
