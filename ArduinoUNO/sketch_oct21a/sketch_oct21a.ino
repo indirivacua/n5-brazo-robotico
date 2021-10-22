@@ -28,6 +28,13 @@ double alpha[ARTICULACIONES] = {PI/2,0,0,-PI/2};
 
 //VARIABLES DE POSICION Y ANGULOS
 double tN[3];
+double J[6][ARTICULACIONES];
+
+void productoCruz(double u[3], double v[3], double w[3]){
+  w[0] = u[1]*v[2] - u[2]*v[1];
+  w[1] = u[2]*v[0] - u[0]*v[2];
+  w[2] = u[0]*v[1] - u[1]*v[0];
+}
 
 // Copiar matriz B en A
 void matrizCopiar(double A[][4], double B[][4]){
@@ -44,11 +51,18 @@ void matrizMultiplicar(double A[][4], double B[][4], double C[][4]){
     }
   }
 }
-void matrizImprimir(double A[][4]){
+
+void vectorResta(double A[3], double B[3], double C[3]){
+  for (int i = 0; i < 3; i++){
+    C[i] = A[i] - B[i];
+  }
+}
+
+void matrizImprimir(double* A, char m, char n){
   Serial.println("IMPRIMIENDO MATRIZ\n");
-  for(int i = 0; i < 4; i++){
-    for (int j = 0; j < 4; j++){
-      Serial.print(A[i][j], DEC);
+  for(int i = 0; i < m; i++){
+    for (int j = 0; j < n; j++){
+      Serial.print(*(A+i*n+j), DEC); //A[i*n+j]
       Serial.print(" \t"); // prints a tab
     }
     Serial.println();
@@ -69,22 +83,80 @@ void cinematicaDirecta(){
                     {0, 0, 1, 0},
                     {0, 0, 0, 1}};
   double Ai[4][4], T[4][4];
+  //VARIABLES PARA JACOBIANO
+  double z[ARTICULACIONES+1][3];
+  double t[ARTICULACIONES+1][3];
+  double prodcruz[3];
+  double auxresta[3];
+  
+  z[0][0] = 0;
+  z[0][1] = 0;
+  z[0][2] = 1;
+
+  t[0][0] = 0;
+  t[0][1] = 0;
+  t[0][2] = 0;
+
+  //CALCULO MATRIZ DEL ROBOT + ARGUMENTOS PARA EL JACOBIANO
   for (int i = 0; i < ARTICULACIONES; i++){
     matrizTransformacionHomogenea(theta[i], d[i], a[i], alpha[i], Ai);
-    //matrizImprimir(Ai); //Serial.print("Hello world.");
+    //matrizImprimir((double*) Ai, 4, 4);
     //I=I*Ai
     matrizMultiplicar(I, Ai, T);
-    matrizCopiar(I, T); //I se vuelve acumulativa, teniendo a 0An finalmente, o sea, la matriz del robot
+    matrizCopiar(I, T); //I se vuelve acumulativa, teniendo a 0A1, 0A2, ... hasta 0An finalmente, o sea, la matriz del robot T
+
+    t[i+1][0]=T[0][3];
+    t[i+1][1]=T[1][3];
+    t[i+1][2]=T[2][3];
+
+    z[i+1][0]=T[0][2];
+    z[i+1][1]=T[1][2];
+    z[i+1][2]=T[2][2];
+
+    /*Serial.print("Iteracion:");
+    Serial.print(i+1,DEC);
+    Serial.println();
+    for(int j = 0; j < 3; j++){
+      Serial.print(z[i+1][j],DEC);
+      Serial.print(" ");
+    }
+    Serial.println();
+    for(int j = 0; j < 3; j++){
+      Serial.print(t[i+1][j],DEC);
+      Serial.print(" ");
+    }
+    Serial.println();*/
   }
-  matrizImprimir(T);
+  //matrizImprimir((double*) T, 4, 4);
+  
   tN[0] = T[0][3];
   tN[1] = T[1][3];
   tN[2] = T[2][3];
+
+  //CALCULO JACOBIANO
+  //Ji = [z(i-1) x tN - t(i-1); z(i-1)]
+  for(int i = 0; i < ARTICULACIONES; i++){
+    vectorResta(t[ARTICULACIONES], t[i], auxresta);
+    productoCruz(z[i], auxresta, prodcruz);
+    J[0][i] = prodcruz[0];
+    J[1][i] = prodcruz[1];
+    J[2][i] = prodcruz[2];
+    J[3][i] = z[i][0];
+    J[4][i] = z[i][1];
+    J[5][i] = z[i][2];
+  }
+  matrizImprimir((double*) J, 6, ARTICULACIONES);
 }
+
+void cinematicaInversa(){
+  
+}
+
 void setup() {
   Serial.begin(9600);
   // put your setup code here, to run once:
   cinematicaDirecta();
+  cinematicaInversa();
 }
 
 void loop() {
