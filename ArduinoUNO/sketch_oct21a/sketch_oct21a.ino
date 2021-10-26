@@ -37,15 +37,14 @@ void productoCruz(double u[3], double v[3], double w[3]){
   w[2] = u[0]*v[1] - u[1]*v[0];
 }
 
-void vectorResta(double A[3], double B[3], double C[3]){
+void vectorResta(double u[3], double v[3], double w[3]){
   for (int i = 0; i < 3; i++){
-    C[i] = A[i] - B[i];
+    w[i] = u[i] - v[i];
   }
 }
 
-// Copiar matriz B en A
-void matrizCopiar(double A[][4], double B[][4]){
-  memcpy(&A[0][0], &B[0][0], 4*4*sizeof(A[0][0]));
+void matrizCopiar(double A[][4], double Acopia[][4]){
+  memcpy(&Acopia[0][0], &A[0][0], 4*4*sizeof(A[0][0]));
 }
 
 void matrizMultiplicar(double A[][4], double B[][4], double C[][4]){
@@ -254,7 +253,7 @@ void matrizTransformacionHomogenea(double theta, double d, double a, double alph
                        {sin(theta),  cos(alpha)*cos(theta), -sin(alpha)*cos(theta), a*sin(theta)},
                        {0         ,  sin(alpha)           ,  cos(alpha)           , d           },
                        {0         ,  0                    ,  0                    , 1           }};
-  matrizCopiar(Ai,Aaux);
+  matrizCopiar(Aaux,Ai);
 }
 
 void cinematicaDirecta(){
@@ -283,7 +282,7 @@ void cinematicaDirecta(){
     //matrizImprimir((double*) Ai, 4, 4);
     //I=I*Ai
     matrizMultiplicar(I, Ai, T);
-    matrizCopiar(I, T); //I se vuelve acumulativa, teniendo a 0A1, 0A2, ... hasta 0An finalmente, o sea, la matriz del robot T
+    matrizCopiar(T, I); //I se vuelve acumulativa, teniendo a 0A1, 0A2, ... hasta 0An finalmente, o sea, la matriz del robot T
 
     t[i+1][0]=T[0][3];
     t[i+1][1]=T[1][3];
@@ -361,7 +360,7 @@ void cinematicaInversa(){
     //CONTINUAR CON EL CALCULO PSEUDOINVERSA DE MOORE PENROSE
     gluInvertMatrix((double*) JtraspuestaJ, (double*) JtraspuestaJ_inversa);
     matrizMultiplicar3(JtraspuestaJ_inversa, Jtraspuesta, JtraspuestaJ_inversaJtraspuesta);
-    matrizImprimir((double*) JtraspuestaJ_inversaJtraspuesta, 4, 6);
+    //matrizImprimir((double*) JtraspuestaJ_inversaJtraspuesta, 4, 6);
 
     //RESOLVER SISTEMA x=J(THETA)*THETA MEDIANTE THETA=J(THETA)^-1*x (METODO MINIMOS CUADRADOS)
     for(int i = 0; i < ARTICULACIONES; i++){
