@@ -278,6 +278,8 @@ void cinematicaDirecta(){
 
   //CALCULO MATRIZ DEL ROBOT + ARGUMENTOS PARA EL JACOBIANO
   for (int i = 0; i < ARTICULACIONES; i++){
+    theta[i] = q[i];
+    
     matrizTransformacionHomogenea(theta[i], d[i], a[i], alpha[i], Ai);
     //matrizImprimir((double*) Ai, 4, 4);
     //I=I*Ai
@@ -378,11 +380,79 @@ void cinematicaInversa(){
   }
 }
 
+//PARAMETROS PARA EL CONTROLADOR
+double Te=0.01; // paso de tiempo del controlador
+double gain=30; // ganancia de controlador
+int N=(int)2/Te+1; // número de pasos para cubrir el círculo dos veces
+
+#define LP 20 //SUJETO A CAMBIOS (ALTURA DEL LAPIZ CON RESPECTO A LA MUNIECA)
+
+void dibujarCirculo(double x_coord, double y_coord, double z_coord, double radio){
+  double x_fig[6], x_fig_sigpos[6], q_aux[ARTICULACIONES];
+  for(int i = 0; i < N; i++){
+    //CALCULO DE LA POSICION DEL ROBOT
+    cinematicaDirecta();
+    
+    //CALCULO DE LA PROXIMA POSICION DEL ROBOT
+    x_fig[0] = x_coord + radio * cos(2*PI*Te*i);
+    x_fig[1] = y_coord + radio * sin(2*PI*Te*i);
+    x_fig[2] = z_coord;
+    x_fig[3] = 0;
+    x_fig[4] = 0;
+    x_fig[5] = 0;
+
+    /*Serial.println("x_fig");
+    for(int j = 0; j < 6; j++){
+      Serial.println(x_fig[j],DEC);
+    }*/
+
+    x_fig_sigpos[0] = x_coord + radio * cos(2*PI*Te*(i+1));
+    x_fig_sigpos[1] = y_coord + radio * sin(2*PI*Te*(i+1));
+    x_fig_sigpos[2] = z_coord;
+    x_fig_sigpos[3] = 0;
+    x_fig_sigpos[4] = 0;
+    x_fig_sigpos[5] = 0;
+
+    /*Serial.println("x_fig_sigpos");
+    for(int j = 0; j < 6; j++){
+      Serial.println(x_fig_sigpos[j],DEC);
+    }*/
+
+    //Serial.println("x");
+    for(int j = 0; j < 6; j++){
+      x[j] = x_fig_sigpos[j] - x_fig[j] + gain * Te * (x_fig[j] - x[j]);
+      //Serial.println(x[j],DEC);
+    }
+
+    //CALCULA LOS ANGULOS DEL MOTOR PARA ALCANZAR LA SIGUIENTE POSICION
+    for(int j = 0; j < ARTICULACIONES; j++){
+      q_aux[j] = q[j]; //POSICION_REPOSO
+    }
+    cinematicaInversa();
+    //matrizImprimir((double*)J, 6, ARTICULACIONES);
+    //Serial.println("q");
+    for(int j = 0; j < ARTICULACIONES; j++){
+      //Serial.println(q[j]);
+      q[j] = q_aux[j] + q[j];
+    }
+
+    // Affiche les angles moteur à chaque itération
+    Serial.print("Iteration:");
+    Serial.println(i);
+    for(int j = 0; j < ARTICULACIONES; j++){
+      Serial.print(q[j], DEC);
+      Serial.print(" ");
+    }
+    Serial.println();
+  }
+}
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  cinematicaDirecta();
-  cinematicaInversa();
+  //cinematicaDirecta();
+  //cinematicaInversa();
+  dibujarCirculo(165,0,LP,20);
 }
 
 void loop() {
