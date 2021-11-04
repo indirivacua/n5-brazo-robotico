@@ -1,35 +1,49 @@
-// Librerias
+//LIBRERIAS
 #include <Servo.h>
 
-//PINS
-#define BASE_IN1 5
-#define BASE_IN2 6
-#define BASE_IN3 7
-#define BASE_IN4 8
-#define HOMBRO   1
-#define CODO     2
-#define MUNIECA  3
+//IDENTIFICADORES DE FIGURAS GEOMETRICAS
+typedef enum {CIRCULO, CUADRADO, TRIANGULO} figura_t;
 
-//MEDIDAS (MM)
-#define L1 10 //SUJETO A CAMBIOS
-#define L2 10 //SUJETO A CAMBIOS
-#define L3 10 //SUJETO A CAMBIOS
-#define L4 10 //SUJETO A CAMBIOS
+//PINS
+#define BASE     5
+#define HOMBRO   6
+#define CODO     7
+#define MUNIECA  8
+
+//MEDIDAS (mm)
+#define L1 45 //SUJETO A CAMBIOS
+#define L2 75 //SUJETO A CAMBIOS
+#define L3 75 //SUJETO A CAMBIOS
+#define L4 40 //SUJETO A CAMBIOS
+#define LP 20 //SUJETO A CAMBIOS (ALTURA DEL LAPIZ CON RESPECTO A LA MUNIECA)
 
 //PARAMETROS GENERALES
 #define ARTICULACIONES 4
 #define POSICION_REPOSO {0,3*PI/4,-PI/2,-3*PI/4+PI/2}; //{0,0,0,0}; //SUJETO A CAMBIOS
 
+//PARAMETROS PARA EL CONTROLADOR
+#define DELTA_T   0.01  //PASO DEL TIEMPO DEL CONTROLADOR
+#define GANANCIA  30    //GANANCIA DEL CONTROLADOR
+
 //PARAMETROS DE DENAVIT-HARTENBERG
 double theta[ARTICULACIONES] = POSICION_REPOSO;
-double d[ARTICULACIONES] = {L1,0,0,L4};
-double a[ARTICULACIONES] = {0,L2,L3,0};
-double alpha[ARTICULACIONES] = {PI/2,0,0,-PI/2};
+double d[ARTICULACIONES] = {L1,0,0,0}; //{L1,0,0,L4};
+double a[ARTICULACIONES] = {0,L2,L3,L4}; //{0,L2,L3,0};
+double alpha[ARTICULACIONES] = {PI/2,0,0,0}; //{PI/2,0,0,-PI/2};
 
 //VARIABLES DE POSICION Y ORIENTACIÓN + JACOBIANO + COORDENADAS ARTICULARES (THETA)
 double x[6] = {0,0,0,0,0,0};
 double J[6][ARTICULACIONES];
 double q[ARTICULACIONES] = POSICION_REPOSO;
+
+//PARAMETROS DE SERVOMOTORES
+Servo servos[ARTICULACIONES];
+const int posicion_reposo[ARTICULACIONES] = POSICION_REPOSO;
+const int pin_servos[ARTICULACIONES] = {BASE,HOMBRO,CODO,MUNIECA};
+const int min_pwm[ARTICULACIONES] = {500,500,600,500}; //{500,500,500,500}; //SUJETO A CAMBIOS
+const int max_pwm[ARTICULACIONES] = {2500,2500,2600,2500}; //{2400,2400,2400,2400}; //SUJETO A CAMBIOS
+const double min_angulo[ARTICULACIONES] = {-PI/2,PI,-2*PI/3,-PI/2}; //{-PI/2,-PI/2,-PI/2,-PI/2}; //SUJETO A CAMBIOS
+const double max_angulo[ARTICULACIONES] = {PI/2,0,PI/2,PI/2}; //{PI/2,PI/2,PI/2,PI/2}; //SUJETO A CAMBIOS
 
 void productoCruz(double u[3], double v[3], double w[3]){
   w[0] = u[1]*v[2] - u[2]*v[1];
@@ -267,7 +281,7 @@ void cinematicaDirecta(){
   double t[ARTICULACIONES+1][3];
   double prodcruz[3];
   double auxresta[3];
-  
+
   z[0][0] = 0;
   z[0][1] = 0;
   z[0][2] = 1;
@@ -279,20 +293,20 @@ void cinematicaDirecta(){
   //CALCULO MATRIZ DEL ROBOT + ARGUMENTOS PARA EL JACOBIANO
   for (int i = 0; i < ARTICULACIONES; i++){
     theta[i] = q[i];
-    
+
     matrizTransformacionHomogenea(theta[i], d[i], a[i], alpha[i], Ai);
     //matrizImprimir((double*) Ai, 4, 4);
-    //I=I*Ai
+    //I = I * Ai
     matrizMultiplicar(I, Ai, T);
-    matrizCopiar(T, I); //I se vuelve acumulativa, teniendo a 0A1, 0A2, ... hasta 0An finalmente, o sea, la matriz del robot T
-
-    t[i+1][0]=T[0][3];
-    t[i+1][1]=T[1][3];
-    t[i+1][2]=T[2][3];
+    matrizCopiar(T, I); //I se vuelve acumulativa, teniendo a 0A1, 0A2, ... hasta 0An=T finalmente
 
     z[i+1][0]=T[0][2];
     z[i+1][1]=T[1][2];
     z[i+1][2]=T[2][2];
+
+    t[i+1][0]=T[0][3];
+    t[i+1][1]=T[1][3];
+    t[i+1][2]=T[2][3];
 
     /*Serial.print("Iteracion:");
     Serial.print(i+1,DEC);
@@ -309,7 +323,7 @@ void cinematicaDirecta(){
     Serial.println();*/
   }
   //matrizImprimir((double*) T, 4, 4);
-  
+
   x[0] = T[0][3];
   x[1] = T[1][3];
   x[2] = T[2][3];
@@ -319,7 +333,7 @@ void cinematicaDirecta(){
   Serial.println();*/
 
   //CALCULO JACOBIANO
-  //Ji = [z(i-1) x tN - t(i-1); z(i-1)]
+  //Ji = [z(i) x (t(n) - t(i)); z(i)], i=0..n-1
   for(int i = 0; i < ARTICULACIONES; i++){
     vectorResta(t[ARTICULACIONES], t[i], auxresta);
     productoCruz(z[i], auxresta, prodcruz);
@@ -342,11 +356,11 @@ void cinematicaInversa(){
   double JtraspuestaJ_inversa[ARTICULACIONES][ARTICULACIONES];
   double JtraspuestaJ_inversaJtraspuesta[ARTICULACIONES][6]; //PSEUDOINVERSA
 
-  //CALCULO PSEUDOINVERSA DE MOORE PENROSE
+  //CALCULO PSEUDOINVERSA DE MOORE-PENROSE
   matrizTraspuesta(J, Jtraspuesta);
-  //matrizImprimir((double*) Jtraspuesta, 4, 6);
+  //matrizImprimir((double*) Jtraspuesta, ARTICULACIONES, 6);
   matrizMultiplicar2(Jtraspuesta, J, JtraspuestaJ);
-  //matrizImprimir((double*) JtraspuestaJ, 4, 4);
+  //matrizImprimir((double*) JtraspuestaJ, ARTICULACIONES, ARTICULACIONES);
 
   /*double A[4][4] = {{1,-2,2,2},{0,4,-2,1},{1,-2,4,0},{1,-1,2,2}};
   Serial.println("DETERMINANTE");
@@ -359,10 +373,10 @@ void cinematicaInversa(){
   //COMPROBAR SI Jtraspuesta*J ES INVERTIBLE (ES NO SINGULAR)
   //Esto se hace para no entrar en un calculo recursivo, donde se hace la pseudoinversa del caso i+1 para calcular la pseudoinversa del caso i (y asi sucesivamente)
   if(matrizDeterminante(JtraspuestaJ) >= 0.1){
-    //CONTINUAR CON EL CALCULO PSEUDOINVERSA DE MOORE PENROSE
+    //CONTINUAR CON EL CALCULO PSEUDOINVERSA DE MOORE-PENROSE
     gluInvertMatrix((double*) JtraspuestaJ, (double*) JtraspuestaJ_inversa);
     matrizMultiplicar3(JtraspuestaJ_inversa, Jtraspuesta, JtraspuestaJ_inversaJtraspuesta);
-    //matrizImprimir((double*) JtraspuestaJ_inversaJtraspuesta, 4, 6);
+    //matrizImprimir((double*) JtraspuestaJ_inversaJtraspuesta, ARTICULACIONES, 6);
 
     //RESOLVER SISTEMA x=J(THETA)*THETA MEDIANTE THETA=J(THETA)^-1*x (METODO MINIMOS CUADRADOS)
     for(int i = 0; i < ARTICULACIONES; i++){
@@ -371,7 +385,7 @@ void cinematicaInversa(){
         q[i] += JtraspuestaJ_inversaJtraspuesta[i][j]*x[j];
       }
     }
-    
+
     /*Serial.println("COORD ARTICULARES");
     for(int i = 0; i < 6; i++){
       Serial.println(q[i],DEC);
@@ -380,47 +394,48 @@ void cinematicaInversa(){
   }
 }
 
-//PARAMETROS PARA EL CONTROLADOR
-double Te=0.01; // paso de tiempo del controlador
-double gain=30; // ganancia de controlador
-int N=(int)2/Te+1; // número de pasos para cubrir el círculo dos veces
+void parametrizacionCirculo(double x_coord, double y_coord, double z_coord, double radio, int i, double x_fig[]){
+  x_fig[0] = x_coord + radio * cos(2*PI*DELTA_T*i);
+  x_fig[1] = y_coord + radio * sin(2*PI*DELTA_T*i);
+  x_fig[2] = z_coord;
+  x_fig[3] = 0;
+  x_fig[4] = 0;
+  x_fig[5] = 0;
+}
 
-#define LP 20 //SUJETO A CAMBIOS (ALTURA DEL LAPIZ CON RESPECTO A LA MUNIECA)
-
-void dibujarCirculo(double x_coord, double y_coord, double z_coord, double radio){
+void dibujarFigura(double x_coord, double y_coord, double z_coord, double tamanio, figura_t tipoFigura){
   double x_fig[6], x_fig_sigpos[6], q_aux[ARTICULACIONES];
+  int N = ((int)(2/DELTA_T)+1); //Numero de pasos para cubrir el circulo dos veces
   for(int i = 0; i < N; i++){
     //CALCULO DE LA POSICION DEL ROBOT
     cinematicaDirecta();
+
+    //CALCULO DE LA PROXIMA POSICION DEL ROBOT SEGUN EL TIPO DE FIGURA
+    switch(tipoFigura){
+      case CIRCULO:
+        parametrizacionCirculo(x_coord, y_coord, z_coord, tamanio, i, x_fig);
+        /*Serial.println("x_fig");
+        for(int j = 0; j < 6; j++){
+          Serial.println(x_fig[j],DEC);
+        }*/
+        parametrizacionCirculo(x_coord, y_coord, z_coord, tamanio, i+1, x_fig_sigpos);
+        /*Serial.println("x_fig_sigpos");
+        for(int j = 0; j < 6; j++){
+          Serial.println(x_fig_sigpos[j],DEC);
+        }*/
+        break;
+      case CUADRADO:
+        //TODO
+        break;
+      case TRIANGULO:
+        //TODO
+        break;
+      default: break;
+    }
     
-    //CALCULO DE LA PROXIMA POSICION DEL ROBOT
-    x_fig[0] = x_coord + radio * cos(2*PI*Te*i);
-    x_fig[1] = y_coord + radio * sin(2*PI*Te*i);
-    x_fig[2] = z_coord;
-    x_fig[3] = 0;
-    x_fig[4] = 0;
-    x_fig[5] = 0;
-
-    /*Serial.println("x_fig");
-    for(int j = 0; j < 6; j++){
-      Serial.println(x_fig[j],DEC);
-    }*/
-
-    x_fig_sigpos[0] = x_coord + radio * cos(2*PI*Te*(i+1));
-    x_fig_sigpos[1] = y_coord + radio * sin(2*PI*Te*(i+1));
-    x_fig_sigpos[2] = z_coord;
-    x_fig_sigpos[3] = 0;
-    x_fig_sigpos[4] = 0;
-    x_fig_sigpos[5] = 0;
-
-    /*Serial.println("x_fig_sigpos");
-    for(int j = 0; j < 6; j++){
-      Serial.println(x_fig_sigpos[j],DEC);
-    }*/
-
     //Serial.println("x");
     for(int j = 0; j < 6; j++){
-      x[j] = x_fig_sigpos[j] - x_fig[j] + gain * Te * (x_fig[j] - x[j]);
+      x[j] = x_fig_sigpos[j] - x_fig[j] + GANANCIA * DELTA_T * (x_fig[j] - x[j]);
       //Serial.println(x[j],DEC);
     }
 
@@ -436,14 +451,52 @@ void dibujarCirculo(double x_coord, double y_coord, double z_coord, double radio
       q[j] = q_aux[j] + q[j];
     }
 
-    // Affiche les angles moteur à chaque itération
-    Serial.print("Iteration:");
+    //ESCRIBIR LOS ANGULOS EN EL SERVOMOTOR
+    servosArticulaciones(10);
+
+    Serial.print("ITERACION:");
     Serial.println(i);
     for(int j = 0; j < ARTICULACIONES; j++){
       Serial.print(q[j], DEC);
       Serial.print(" ");
     }
     Serial.println();
+  }
+  servosReposo(500);
+}
+
+//https://stackoverflow.com/questions/16600152/convert-negative-angle-to-positive-involves-invalid-operand-use/16601198#16601198
+double to_positive_angle_180(double angle)
+{
+   angle = fmod(angle, 180);
+   if (angle < 0) angle += 180;
+   return angle;
+}
+
+//https://stackoverflow.com/questions/14920675/is-there-a-function-in-c-language-to-calculate-degrees-radians/14920710#14920710
+inline double to_degrees(double radians) {
+    return radians * (180.0 / PI);
+}
+
+void servosInicializar(){
+  for(int i = 0; i < ARTICULACIONES; i++){
+     servos[i].attach(pin_servos[i],min_pwm[i],max_pwm[i]);
+     servos[i].write(0);
+  }
+  delay(2000);
+}
+
+void servosArticulaciones(int velocidad){
+  for(int i = 0; i < ARTICULACIONES; i++){
+    servos[i].write(to_positive_angle_180(to_degrees(q[i])));
+    delay(velocidad);
+  }
+}
+
+void servosReposo(int velocidad){
+  for(int i = 0; i < ARTICULACIONES; i++){
+    servos[i].write(to_positive_angle_180(to_degrees(posicion_reposo[i])));
+    delay(velocidad);
   }
 }
 
@@ -452,7 +505,10 @@ void setup() {
   Serial.begin(9600);
   //cinematicaDirecta();
   //cinematicaInversa();
-  dibujarCirculo(165,0,LP,20);
+  servosInicializar();
+  Serial.println("DIBUJAR CIRCULO");
+  dibujarFigura(165,0,LP,20,CIRCULO);
+  Serial.println("FINALIZADO CIRCULO");
 }
 
 void loop() {
