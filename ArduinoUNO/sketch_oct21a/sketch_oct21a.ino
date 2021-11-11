@@ -444,43 +444,36 @@ void dibujarFigura(double x_coord, double y_coord, double z_coord, double tamani
       q_aux[j] = q[j]; //POSICION_REPOSO
     }
     cinematicaInversa();
-    //matrizImprimir((double*)J, 6, ARTICULACIONES);
+    //matrizImprimir((double*) J, 6, ARTICULACIONES);
     //Serial.println("q");
     for(int j = 0; j < ARTICULACIONES; j++){
       //Serial.println(q[j]);
       q[j] = q_aux[j] + q[j];
     }
 
+    Serial.print("ITERACION:");
+    Serial.println(i);
+
     //ESCRIBIR LOS ANGULOS EN EL SERVOMOTOR
     servosArticulaciones(10);
 
-    Serial.print("ITERACION:");
-    Serial.println(i);
-    for(int j = 0; j < ARTICULACIONES; j++){
-      Serial.print(q[j], DEC);
+    /*for(int j = 0; j < ARTICULACIONES; j++){
+      Serial.print(q[j]*180/PI,DEC); //rad2deg
       Serial.print(" ");
-    }
+    }*/
     Serial.println();
   }
   servosReposo(500);
 }
 
-//https://stackoverflow.com/questions/16600152/convert-negative-angle-to-positive-involves-invalid-operand-use/16601198#16601198
-double to_positive_angle_180(double angle)
-{
-   angle = fmod(angle, 180);
-   if (angle < 0) angle += 180;
-   return angle;
-}
-
-//https://stackoverflow.com/questions/14920675/is-there-a-function-in-c-language-to-calculate-degrees-radians/14920710#14920710
-inline double to_degrees(double radians) {
-    return radians * (180.0 / PI);
+int angulo2pwm(double angulo, int i){
+  //Ancho de pulso (o tiempo en alto) de la senial PWM
+  return min(max(((min_pwm[i] - max_pwm[i]) / (min_angulo[i] - max_angulo[i])) * (angulo - min_angulo[i]) + min_pwm[i], min_pwm[i]), max_pwm[i]);
 }
 
 void servosInicializar(){
   for(int i = 0; i < ARTICULACIONES; i++){
-     servos[i].attach(pin_servos[i],min_pwm[i],max_pwm[i]);
+     servos[i].attach(pin_servos[i], min_pwm[i], max_pwm[i]);
      servos[i].write(0);
   }
   delay(2000);
@@ -488,14 +481,16 @@ void servosInicializar(){
 
 void servosArticulaciones(int velocidad){
   for(int i = 0; i < ARTICULACIONES; i++){
-    servos[i].write(to_positive_angle_180(to_degrees(q[i])));
+    servos[i].writeMicroseconds(angulo2pwm(q[i], i));
+    Serial.print(angulo2pwm(q[i], i),DEC);
+    Serial.print(" ");
     delay(velocidad);
   }
 }
 
 void servosReposo(int velocidad){
   for(int i = 0; i < ARTICULACIONES; i++){
-    servos[i].write(to_positive_angle_180(to_degrees(posicion_reposo[i])));
+    servos[i].writeMicroseconds(angulo2pwm(posicion_reposo[i], i));
     delay(velocidad);
   }
 }
