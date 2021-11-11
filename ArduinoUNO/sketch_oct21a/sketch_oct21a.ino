@@ -11,15 +11,15 @@ typedef enum {CIRCULO, CUADRADO, TRIANGULO} figura_t;
 #define MUNIECA  8
 
 //MEDIDAS (mm)
-#define L1 45 //SUJETO A CAMBIOS
-#define L2 75 //SUJETO A CAMBIOS
-#define L3 75 //SUJETO A CAMBIOS
-#define L4 40 //SUJETO A CAMBIOS
+#define L1 50 //SUJETO A CAMBIOS
+#define L2 50 //SUJETO A CAMBIOS
+#define L3 50 //SUJETO A CAMBIOS
+#define L4 50 //SUJETO A CAMBIOS
 #define LP 20 //SUJETO A CAMBIOS (ALTURA DEL LAPIZ CON RESPECTO A LA MUNIECA)
 
 //PARAMETROS GENERALES
 #define ARTICULACIONES 4
-#define POSICION_REPOSO {0,3*PI/4,-PI/2,-3*PI/4+PI/2}; //{0,0,0,0}; //SUJETO A CAMBIOS
+#define POSICION_REPOSO {0,0,0,0}; //SUJETO A CAMBIOS
 
 //PARAMETROS PARA EL CONTROLADOR
 #define DELTA_T   0.01  //PASO DEL TIEMPO DEL CONTROLADOR
@@ -40,10 +40,10 @@ double q[ARTICULACIONES] = POSICION_REPOSO;
 Servo servos[ARTICULACIONES];
 const int posicion_reposo[ARTICULACIONES] = POSICION_REPOSO;
 const int pin_servos[ARTICULACIONES] = {BASE,HOMBRO,CODO,MUNIECA};
-const int min_pwm[ARTICULACIONES] = {500,500,600,500}; //{500,500,500,500}; //SUJETO A CAMBIOS
-const int max_pwm[ARTICULACIONES] = {2500,2500,2600,2500}; //{2400,2400,2400,2400}; //SUJETO A CAMBIOS
-const double min_angulo[ARTICULACIONES] = {-PI/2,PI,-2*PI/3,-PI/2}; //{-PI/2,-PI/2,-PI/2,-PI/2}; //SUJETO A CAMBIOS
-const double max_angulo[ARTICULACIONES] = {PI/2,0,PI/2,PI/2}; //{PI/2,PI/2,PI/2,PI/2}; //SUJETO A CAMBIOS
+const int min_pwm[ARTICULACIONES] = {500,500,500,500}; //SUJETO A CAMBIOS
+const int max_pwm[ARTICULACIONES] = {2400,2400,2400,2400}; //SUJETO A CAMBIOS
+const double min_angulo[ARTICULACIONES] = {0,0,0,0}; //{-PI/2,-PI/2,-PI/2,-PI/2}; //SUJETO A CAMBIOS
+const double max_angulo[ARTICULACIONES] = {PI,PI,PI,PI}; //{PI/2,PI/2,PI/2,PI/2}; //SUJETO A CAMBIOS
 
 void productoCruz(double u[3], double v[3], double w[3]){
   w[0] = u[1]*v[2] - u[2]*v[1];
@@ -502,7 +502,7 @@ void setup() {
   //cinematicaInversa();
   servosInicializar();
   Serial.println("DIBUJAR CIRCULO");
-  dibujarFigura(165,0,LP,20,CIRCULO);
+  dibujarFigura(82,30,LP,20,CIRCULO);
   Serial.println("FINALIZADO CIRCULO");
 }
 
