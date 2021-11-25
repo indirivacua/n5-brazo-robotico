@@ -1,0 +1,52 @@
+{% extends "_base.html" %}
+
+{% block title %}
+BRD - Configuración
+{% endblock %}
+
+{% block content %}
+<br>
+<div class="container text-center">
+    <h3 class="text-center form-group">CONFIGURACIÓN</h3>
+    <h5 class="text-center form-group">EDITAR PERFIL</h5>
+    <br>
+    <form method="PUT" class="form-register" align="center">
+        {{ form.hidden_tag() }}
+        <div class="row">
+            <div class="col-3 offset-3">
+                Email
+                {{ form.email(class="form-control", placeholder="email@ejemplo.com") }}
+                <small id="password_help" class="form-text text-muted"> Ingrese un email válido.</small>
+            </div>
+            <div class="col-3" align="center">
+                Usuario
+                {{ form.username(class="form-control", placeholder="Ingresar nombre de usuario") }}
+                <small id="password_help" class="form-text text-muted"> Entre 2 a 15 caracteres.</small>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-3 offset-3" align="center">
+                Contraseña
+                {{ form.password_ok(class="form-control", placeholder="Ingresar contraseña") }}
+                <small id="password_help" class="form-text text-muted"> Mínimo 8 caracteres.</small>
+            </div>
+            <div class="col-3" align="center">
+                Confirmar contraseña
+                {{ form.password_ch(class="form-control", placeholder="Confirmar contraseña") }}
+                <small id="password_help" class="form-text text-muted"> Mínimo 8 caracteres.</small>
+            </div>
+        </div>
+        <br>
+        {{ form.submit(class="btn btn-primary") }}
+    </form>
+
+    <br>
+    <h5 class="text-center form-group">ELIMINAR CUENTA</h5>
+    <h6>Al eliminar la cuenta, perderá toda su información de contacto y los dibujos realizados.</h6>
+    <h6>¿Está seguro que desea eliminar su cuenta de usuario? Esta acción no puede deshacerse.</h6>
+    <br>
+    <a href="{{ url_for('unsubscribe_page') }}" class="btn btn-danger mr-2">Eliminar cuenta</a>
+
+</div>
+{% endblock %}
