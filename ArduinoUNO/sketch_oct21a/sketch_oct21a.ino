@@ -5,10 +5,10 @@
 typedef enum {CIRCULO, CUADRADO, TRIANGULO} figura_t;
 
 //PINS
-#define BASE     5
-#define HOMBRO   6
-#define CODO     7
-#define MUNIECA  8
+#define BASE     15
+#define HOMBRO   13
+#define CODO     12
+#define MUNIECA  14
 
 //MEDIDAS (mm)
 #define L1 50
@@ -67,7 +67,7 @@ void matrizImprimir(double* A, char m, char n){
   Serial.println("IMPRIMIENDO MATRIZ\n");
   for(int i = 0; i < m; i++){
     for (int j = 0; j < n; j++){
-      Serial.print(*(A+i*n+j), DEC); //A[i*n+j]
+      Serial.print(*(A+i*n+j)); //A[i*n+j]
       Serial.print(" \t"); // prints a tab
     }
     Serial.println();
@@ -184,7 +184,7 @@ void dibujarFigura(double x_coord, double y_coord, double z_coord, double tamani
     servosArticulaciones(10);
 
     /*for(int j = 0; j < ARTICULACIONES; j++){
-      Serial.print(q[j]*180/PI,DEC); //rad2deg
+      Serial.print(q[j]*180/PI); //rad2deg
       Serial.print(" ");
     }*/
     Serial.println();
@@ -204,6 +204,7 @@ void servosInicializar(){
   for(int i = 0; i < ARTICULACIONES; i++){
      servos[i].attach(pin_servos[i], min_pwm[i], max_pwm[i]);
      servos[i].write(0);
+     delay(100);
   }
   delay(2000);
 }
@@ -211,7 +212,7 @@ void servosInicializar(){
 void servosArticulaciones(int velocidad){
   for(int i = 0; i < ARTICULACIONES; i++){
     servos[i].writeMicroseconds(angulo2pwm(q[i], i));
-    Serial.print(angulo2pwm(q[i], i),DEC);
+    Serial.print(angulo2pwm(q[i], i));
     Serial.print(" ");
     delay(velocidad);
   }
@@ -227,17 +228,18 @@ void servosReposo(int velocidad){
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
+  delay(5000);
   servosInicializar();
   x[0] = 120; x[1] = 50; x[2] = 20;
   cinematicaInversa(x, q);
   Serial.println("ANGULOS:");
-  Serial.print(q[0]*180/PI,DEC);
+  Serial.print(q[0]*180/PI);
   Serial.print(" ");
-  Serial.print(q[1]*180/PI,DEC);
+  Serial.print(q[1]*180/PI);
   Serial.print(" ");
-  Serial.print(-(180-q[2]*180/PI),DEC);
+  Serial.print(-(180-q[2]*180/PI));
   Serial.print(" ");
-  Serial.print(180-q[3]*180/PI,DEC);
+  Serial.print(180-q[3]*180/PI);
   Serial.println();
   for (int i = 0; i < 6; i++) x[i] = 0; //REINICIO
   q[0] = q[0];
@@ -247,7 +249,7 @@ void setup() {
   cinematicaDirecta(theta, d, a, alpha, q, x);
   Serial.println("POSICIONES:");
   for (int i = 0; i < 6; i++){
-    Serial.print(x[i],DEC);
+    Serial.print(x[i]);
     Serial.print(" ");
   }
   Serial.println();
@@ -264,5 +266,6 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-
+  Serial.print("Hola");
+  delay(100000);
 }
