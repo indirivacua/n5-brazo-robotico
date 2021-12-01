@@ -146,14 +146,11 @@ void dibujarFigura(double x_coord, double y_coord, double z_coord, double tamani
   double x_fig[6], x_fig_sigpos[6], q_aux[ARTICULACIONES];
   int N = ((int)(2/DELTA_T)+1); //Numero de pasos para cubrir el circulo dos veces
   for(int i = 0; i < N; i++){
-    //CALCULO DE LA POSICION DEL ROBOT
-    cinematicaDirecta(theta, d, a, alpha, q, x);
 
     //CALCULO DE LA PROXIMA POSICION DEL ROBOT SEGUN EL TIPO DE FIGURA
     switch(tipoFigura){
       case CIRCULO:
         parametrizacionCirculo(x_coord, y_coord, z_coord, tamanio, i, x_fig);
-        parametrizacionCirculo(x_coord, y_coord, z_coord, tamanio, i+1, x_fig_sigpos);
         break;
       case CUADRADO:
         //TODO
@@ -163,19 +160,19 @@ void dibujarFigura(double x_coord, double y_coord, double z_coord, double tamani
         break;
       default: break;
     }
-    
-    for(int j = 0; j < 6; j++){
-      x[j] = x_fig_sigpos[j] - x_fig[j] + GANANCIA * DELTA_T * (x_fig[j] - x[j]);
-    }
 
-    //CALCULA LOS ANGULOS DEL MOTOR PARA ALCANZAR LA SIGUIENTE POSICION
-    for(int j = 0; j < ARTICULACIONES; j++){
-      q_aux[j] = q[j]; //POSICION_REPOSO
-    }
+    x[0] = x_fig[0]; x[1] = x_fig[1]; x[2] = x_fig[2];
+
     cinematicaInversa(x, q);
-    for(int j = 0; j < ARTICULACIONES; j++){
-      q[j] = q_aux[j] + q[j];
-    }
+
+    q[0] = q[0];
+    q[1] = q[1];
+    q[2] = -(PI-q[2]);
+    q[3] = PI-q[3];
+
+    q[0] = q[0] + PI/2; //map(q[i], -90, 90, 0, 180);
+    q[2] = q[2] + PI/2;
+    q[3] = q[3] + PI/2;
 
     Serial.print("ITERACION:");
     Serial.println(i);
@@ -230,7 +227,7 @@ void setup() {
   Serial.begin(9600);
   delay(5000);
   servosInicializar();
-  x[0] = 120; x[1] = 50; x[2] = 20;
+  /*x[0] = 120; x[1] = 50; x[2] = 20;
   cinematicaInversa(x, q);
   Serial.println("ANGULOS:");
   Serial.print(q[0]*180/PI);
@@ -258,10 +255,10 @@ void setup() {
   q[3] = q[3] + PI/2;
   Serial.println("IMPULSOS:");
   servosArticulaciones(10);
-  Serial.println();
-  /*Serial.println("DIBUJAR CIRCULO");
-  dibujarFigura(120,50,LP,20,CIRCULO);
-  Serial.println("FINALIZADO CIRCULO");*/
+  Serial.println();*/
+  Serial.println("DIBUJAR CIRCULO");
+  dibujarFigura(130,40,35,10,CIRCULO);
+  Serial.println("FINALIZADO CIRCULO");
 }
 
 void loop() {
