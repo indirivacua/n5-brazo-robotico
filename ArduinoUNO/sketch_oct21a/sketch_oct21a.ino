@@ -245,9 +245,26 @@ void servosArticulaciones(int velocidad){
 
 void servosReposo(int velocidad){
   for(int i = 0; i < ARTICULACIONES; i++){
-    servos[i].writeMicroseconds(angulo2pwm(posicion_reposo[i], i));
+    servos[i].write(90);
     delay(velocidad);
   }
+}
+
+void dibujarCuadrado(int xc, int yc, int tam) {
+  double tam2 = tam/2;
+  dibujarSegmento(xc - tam2, yc + tam2, xc - tam2, yc - tam2, LP);
+  dibujarSegmento(xc - tam2, yc - tam2, xc + tam2, yc - tam2, LP);
+  dibujarSegmento(xc + tam2, yc - tam2, xc + tam2, yc + tam2, LP);
+  dibujarSegmento(xc + tam2, yc + tam2, xc - tam2, yc + tam2, LP);
+  
+}
+
+void dibujarTriangulo(int xc, int yc, int tam) {
+  double tam2 = tam/2;
+  double h2 = sqrt(3) *  tam/4;
+  dibujarSegmento(xc - h2, yc + tam2, xc - h2, yc - tam2, LP);
+  dibujarSegmento(xc - h2, yc - tam2, xc + h2, yc, LP);
+  dibujarSegmento(xc + h2, yc, xc - h2, yc + tam2, LP);
 }
 
 void setup() {
@@ -255,13 +272,18 @@ void setup() {
   Serial.begin(9600);
   delay(5000);
   servosInicializar();
+  
 
-  dibujarSegmento(120,50,120,-50,20);
+  //dibujarSegmento(120,50,120,-50,20);
 
   Serial.println("DIBUJAR CIRCULO");
   //dibujarCirculo(130,40,35,10);
+  dibujarTriangulo(130, 20, 20);
+  servosReposo(20);
   Serial.println("FINALIZADO CIRCULO");
 }
+
+
 
 void loop() {
   // put your main code here, to run repeatedly:
