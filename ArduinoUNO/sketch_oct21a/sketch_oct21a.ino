@@ -141,24 +141,13 @@ void parametrizacionCirculo(double x_coord, double y_coord, double z_coord, doub
   x_fig[5] = 0;
 }
 
-void dibujarFigura(double x_coord, double y_coord, double z_coord, double tamanio, figura_t tipoFigura){
-  double x_fig[6], x_fig_sigpos[6], q_aux[ARTICULACIONES];
+void dibujarCirculo(double x_coord, double y_coord, double z_coord, double radio){
+  double x_fig[6];
   int N = ((int)(2/DELTA_T)+1); //Numero de pasos para cubrir el circulo dos veces
   for(int i = 0; i < N; i++){
 
-    //CALCULO DE LA PROXIMA POSICION DEL ROBOT SEGUN EL TIPO DE FIGURA
-    switch(tipoFigura){
-      case CIRCULO:
-        parametrizacionCirculo(x_coord, y_coord, z_coord, tamanio, i, x_fig);
-        break;
-      case CUADRADO:
-        //TODO
-        break;
-      case TRIANGULO:
-        //TODO
-        break;
-      default: break;
-    }
+    //CALCULO DE LA PROXIMA POSICION DEL ROBOT
+    parametrizacionCirculo(x_coord, y_coord, z_coord, radio, i, x_fig);
 
     x[0] = x_fig[0]; x[1] = x_fig[1]; x[2] = x_fig[2];
 
@@ -186,6 +175,46 @@ void dibujarFigura(double x_coord, double y_coord, double z_coord, double tamani
     Serial.println();
   }
   servosReposo(500);
+}
+
+void dibujarSegmento(double p1x, double p1y, double p2x, double p2y, double altura){
+  double N = 100+1; //((int)(2/DELTA_T)+1); //El +1 es porque sino va de 50 a -49 (debería ir a -50)
+  for (double t = 0; t < N; t++){
+    //(1-t)(p1x,p1y) + t*(p2x,p2y)
+    x[0] = (1-t/N) * p1x + (t/N) * p2x;
+    x[1] = (1-t/N) * p1y + (t/N) * p2y;
+    x[2] = altura;
+
+    Serial.print(x[0]);
+    Serial.print(" ");
+    Serial.print(x[1]);
+    Serial.print(" ");
+    Serial.print(x[2]);
+    Serial.println();
+
+    cinematicaInversa(x, q);
+
+    q[0] = q[0];
+    q[1] = q[1];
+    q[2] = -(PI-q[2]);
+    q[3] = PI-q[3];
+
+    q[0] = q[0] + PI/2; //map(q[i], -90, 90, 0, 180);
+    q[2] = q[2] + PI/2;
+    q[3] = q[3] + PI/2;
+
+    Serial.print("ITERACION:");
+    Serial.println(t);
+
+    //ESCRIBIR LOS ANGULOS EN EL SERVOMOTOR
+    servosArticulaciones(10);
+
+    /*for(int j = 0; j < ARTICULACIONES; j++){
+      Serial.print(q[j]*180/PI); //rad2deg
+      Serial.print(" ");
+    }*/
+    Serial.println();
+  }
 }
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
@@ -226,6 +255,20 @@ void setup() {
   Serial.begin(9600);
   delay(5000);
   servosInicializar();
+
+  dibujarSegmento(120,50,120,-50,20);
+
+  Serial.println("DIBUJAR CIRCULO");
+  //dibujarCirculo(130,40,35,10);
+  Serial.println("FINALIZADO CIRCULO");
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  Serial.print("Hola");
+  delay(100000);
+}
+
   /*x[0] = 120; x[1] = 50; x[2] = 20;
   cinematicaInversa(x, q);
   Serial.println("ANGULOS:");
@@ -256,7 +299,7 @@ void setup() {
   servosArticulaciones(10);
   Serial.println();*/
 
-  float p1x = 120, p1y = 50;
+  /*float p1x = 120, p1y = 50;
   float p2x = 120, p2y = -50;
 
   float N = 100+1;//((int)(2/DELTA_T)+1); //El +1 es porque sino va de 50 a -49 (debería ir a -50)
@@ -290,20 +333,5 @@ void setup() {
     //ESCRIBIR LOS ANGULOS EN EL SERVOMOTOR
     servosArticulaciones(10);
 
-    /*for(int j = 0; j < ARTICULACIONES; j++){
-      Serial.print(q[j]*180/PI); //rad2deg
-      Serial.print(" ");
-    }*/
     Serial.println();
-  }
-
-  Serial.println("DIBUJAR CIRCULO");
-  //dibujarFigura(130,40,35,10,CIRCULO);
-  Serial.println("FINALIZADO CIRCULO");
-}
-
-void loop() {
-  // put your main code here, to run repeatedly:
-  Serial.print("Hola");
-  delay(100000);
-}
+  }*/
