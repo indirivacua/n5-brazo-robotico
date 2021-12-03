@@ -1,9 +1,6 @@
 //LIBRERIAS
 #include <Servo.h>
 
-//IDENTIFICADORES DE FIGURAS GEOMETRICAS
-typedef enum {CIRCULO, CUADRADO, TRIANGULO} figura_t;
-
 //PINS
 #define BASE     15
 #define HOMBRO   13
@@ -19,88 +16,21 @@ typedef enum {CIRCULO, CUADRADO, TRIANGULO} figura_t;
 
 //PARAMETROS GENERALES
 #define ARTICULACIONES 4
-#define POSICION_REPOSO {PI/2,0,PI/2,PI/2};
 
 //PARAMETROS PARA EL CONTROLADOR
-#define DELTA_T   0.01  //PASO DEL TIEMPO DEL CONTROLADOR
-
-//PARAMETROS DE DENAVIT-HARTENBERG
-double theta[ARTICULACIONES] = POSICION_REPOSO;
-double d[ARTICULACIONES] = {L1,0,0,0}; //{L1,0,0,L4};
-double a[ARTICULACIONES] = {0,L2,L3,L4}; //{0,L2,L3,0};
-double alpha[ARTICULACIONES] = {PI/2,0,0,0}; //{PI/2,0,0,-PI/2};
+#define DELTA_T   0.01 //PASO DEL TIEMPO DEL CONTROLADOR
 
 //VARIABLES DE POSICION Y ORIENTACIÓN + COORDENADAS ARTICULARES (THETA)
 double x[6] = {0,0,0,0,0,0};
-double q[ARTICULACIONES] = POSICION_REPOSO;
+double q[ARTICULACIONES];
 
 //PARAMETROS DE SERVOMOTORES
 Servo servos[ARTICULACIONES];
-const int posicion_reposo[ARTICULACIONES] = POSICION_REPOSO;
 const int pin_servos[ARTICULACIONES] = {BASE,HOMBRO,CODO,MUNIECA};
 const int min_pwm[ARTICULACIONES] = {500,500,500,500};
 const int max_pwm[ARTICULACIONES] = {2400,2400,2400,2400};
 const double min_angulo[ARTICULACIONES] = {0,0,0,0};
 const double max_angulo[ARTICULACIONES] = {PI,PI,PI,PI};
-
-void matrizCopiar(double A[][4], double Acopia[][4]){
-  for (int i = 0; i < 4; i++){
-    for (int j = 0; j < 4; j++){
-      Acopia[i][j] = A[i][j];
-    }
-  }
-}
-
-void matrizMultiplicar(double A[][4], double B[][4], double C[][4]){
-  for (int i = 0; i < 4; i++){ //filas 1
-    for (int j = 0; j < 4; j++){ //columnas 2
-      C[i][j] = 0;
-      for (int k = 0; k < 4; k++){ //columnas 1
-        C[i][j] += A[i][k] * B[k][j];
-      }
-    }
-  }
-}
-
-void matrizImprimir(double* A, char m, char n){
-  Serial.println("IMPRIMIENDO MATRIZ\n");
-  for(int i = 0; i < m; i++){
-    for (int j = 0; j < n; j++){
-      Serial.print(*(A+i*n+j)); //A[i*n+j]
-      Serial.print(" \t"); // prints a tab
-    }
-    Serial.println();
-  }
-}
-
-void matrizTransformacionHomogenea(double theta, double d, double a, double alpha, double Ai[][4]){
-  double Aaux[4][4] = {{cos(theta), -cos(alpha)*sin(theta),  sin(alpha)*sin(theta), a*cos(theta)},
-                       {sin(theta),  cos(alpha)*cos(theta), -sin(alpha)*cos(theta), a*sin(theta)},
-                       {0         ,  sin(alpha)           ,  cos(alpha)           , d           },
-                       {0         ,  0                    ,  0                    , 1           }};
-  matrizCopiar(Aaux,Ai);
-}
-
-void cinematicaDirecta(double theta[], double d[], double a[], double alpha[], double q[], double x[]){
-  double I[4][4] = {{1, 0, 0, 0},
-                    {0, 1, 0, 0},
-                    {0, 0, 1, 0},
-                    {0, 0, 0, 1}};
-  double Ai[4][4], T[4][4];
-
-  //CALCULO MATRIZ DEL ROBOT
-  for (int i = 0; i < ARTICULACIONES; i++){
-    theta[i] = q[i];
-    matrizTransformacionHomogenea(theta[i], d[i], a[i], alpha[i], Ai);
-    //I = I * Ai
-    matrizMultiplicar(I, Ai, T);
-    matrizCopiar(T, I); //I se vuelve acumulativa, teniendo a 0A1, 0A2, ... hasta 0An=T finalmente
-  }
-
-  x[0] = T[0][3];
-  x[1] = T[1][3];
-  x[2] = T[2][3];
-}
 
 void cinematicaInversa(double x[], double q[]){
   double x_EE = x[0], z_EE = x[1], y_EE = x[2];
@@ -145,7 +75,6 @@ void dibujarCirculo(double x_coord, double y_coord, double z_coord, double radio
   double x_fig[6];
   int N = ((int)(2/DELTA_T)+1); //Numero de pasos para cubrir el circulo dos veces
   for(int i = 0; i < N; i++){
-
     //CALCULO DE LA PROXIMA POSICION DEL ROBOT
     parametrizacionCirculo(x_coord, y_coord, z_coord, radio, i, x_fig);
 
@@ -162,17 +91,8 @@ void dibujarCirculo(double x_coord, double y_coord, double z_coord, double radio
     q[2] = q[2] + PI/2;
     q[3] = q[3] + PI/2;
 
-    Serial.print("ITERACION:");
-    Serial.println(i);
-
     //ESCRIBIR LOS ANGULOS EN EL SERVOMOTOR
     servosArticulaciones(10);
-
-    /*for(int j = 0; j < ARTICULACIONES; j++){
-      Serial.print(q[j]*180/PI); //rad2deg
-      Serial.print(" ");
-    }*/
-    Serial.println();
   }
   servosReposo(500);
 }
@@ -185,13 +105,6 @@ void dibujarSegmento(double p1x, double p1y, double p2x, double p2y, double altu
     x[1] = (1-t/N) * p1y + (t/N) * p2y;
     x[2] = altura;
 
-    Serial.print(x[0]);
-    Serial.print(" ");
-    Serial.print(x[1]);
-    Serial.print(" ");
-    Serial.print(x[2]);
-    Serial.println();
-
     cinematicaInversa(x, q);
 
     q[0] = q[0];
@@ -203,18 +116,27 @@ void dibujarSegmento(double p1x, double p1y, double p2x, double p2y, double altu
     q[2] = q[2] + PI/2;
     q[3] = q[3] + PI/2;
 
-    Serial.print("ITERACION:");
-    Serial.println(t);
-
     //ESCRIBIR LOS ANGULOS EN EL SERVOMOTOR
     servosArticulaciones(10);
-
-    /*for(int j = 0; j < ARTICULACIONES; j++){
-      Serial.print(q[j]*180/PI); //rad2deg
-      Serial.print(" ");
-    }*/
-    Serial.println();
   }
+}
+
+void dibujarCuadrado(int xc, int yc, int tam) {
+  double tam2 = tam/2;
+  dibujarSegmento(xc - tam2, yc + tam2, xc - tam2, yc - tam2, LP);
+  dibujarSegmento(xc - tam2, yc - tam2, xc + tam2, yc - tam2, LP);
+  dibujarSegmento(xc + tam2, yc - tam2, xc + tam2, yc + tam2, LP);
+  dibujarSegmento(xc + tam2, yc + tam2, xc - tam2, yc + tam2, LP);
+  servosReposo(20);
+}
+
+void dibujarTriangulo(int xc, int yc, int tam) {
+  double tam2 = tam/2;
+  double h2 = sqrt(3) *  tam/4;
+  dibujarSegmento(xc - h2, yc + tam2, xc - h2, yc - tam2, LP);
+  dibujarSegmento(xc - h2, yc - tam2, xc + h2, yc, LP);
+  dibujarSegmento(xc + h2, yc, xc - h2, yc + tam2, LP);
+  servosReposo(20);
 }
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
@@ -228,7 +150,7 @@ int angulo2pwm(double angulo, int i){
 void servosInicializar(){
   for(int i = 0; i < ARTICULACIONES; i++){
      servos[i].attach(pin_servos[i], min_pwm[i], max_pwm[i]);
-     //servos[i].write(0);
+     servos[i].write(90);
      delay(100);
   }
   delay(2000);
@@ -237,8 +159,6 @@ void servosInicializar(){
 void servosArticulaciones(int velocidad){
   for(int i = 0; i < ARTICULACIONES; i++){
     servos[i].writeMicroseconds(angulo2pwm(q[i], i));
-    Serial.print(angulo2pwm(q[i], i));
-    Serial.print(" ");
     delay(velocidad);
   }
 }
@@ -250,110 +170,15 @@ void servosReposo(int velocidad){
   }
 }
 
-void dibujarCuadrado(int xc, int yc, int tam) {
-  double tam2 = tam/2;
-  dibujarSegmento(xc - tam2, yc + tam2, xc - tam2, yc - tam2, LP);
-  dibujarSegmento(xc - tam2, yc - tam2, xc + tam2, yc - tam2, LP);
-  dibujarSegmento(xc + tam2, yc - tam2, xc + tam2, yc + tam2, LP);
-  dibujarSegmento(xc + tam2, yc + tam2, xc - tam2, yc + tam2, LP);
-  
-}
-
-void dibujarTriangulo(int xc, int yc, int tam) {
-  double tam2 = tam/2;
-  double h2 = sqrt(3) *  tam/4;
-  dibujarSegmento(xc - h2, yc + tam2, xc - h2, yc - tam2, LP);
-  dibujarSegmento(xc - h2, yc - tam2, xc + h2, yc, LP);
-  dibujarSegmento(xc + h2, yc, xc - h2, yc + tam2, LP);
-}
-
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   delay(5000);
   servosInicializar();
-  
-
-  //dibujarSegmento(120,50,120,-50,20);
-
-  Serial.println("DIBUJAR CIRCULO");
-  //dibujarCirculo(130,40,35,10);
-  dibujarTriangulo(130, 20, 20);
-  servosReposo(20);
-  Serial.println("FINALIZADO CIRCULO");
 }
-
-
 
 void loop() {
   // put your main code here, to run repeatedly:
   Serial.print("Hola");
   delay(100000);
 }
-
-  /*x[0] = 120; x[1] = 50; x[2] = 20;
-  cinematicaInversa(x, q);
-  Serial.println("ANGULOS:");
-  Serial.print(q[0]*180/PI);
-  Serial.print(" ");
-  Serial.print(q[1]*180/PI);
-  Serial.print(" ");
-  Serial.print(-(180-q[2]*180/PI));
-  Serial.print(" ");
-  Serial.print(180-q[3]*180/PI);
-  Serial.println();
-  for (int i = 0; i < 6; i++) x[i] = 0; //REINICIO
-  q[0] = q[0];
-  q[1] = q[1];
-  q[2] = -(PI-q[2]);
-  q[3] = PI-q[3];
-  cinematicaDirecta(theta, d, a, alpha, q, x);
-  Serial.println("POSICIONES:");
-  for (int i = 0; i < 6; i++){
-    Serial.print(x[i]);
-    Serial.print(" ");
-  }
-  Serial.println();
-  q[0] = q[0] + PI/2; //map(q[i], -90, 90, 0, 180);
-  q[2] = q[2] + PI/2;
-  q[3] = q[3] + PI/2;
-  Serial.println("IMPULSOS:");
-  servosArticulaciones(10);
-  Serial.println();*/
-
-  /*float p1x = 120, p1y = 50;
-  float p2x = 120, p2y = -50;
-
-  float N = 100+1;//((int)(2/DELTA_T)+1); //El +1 es porque sino va de 50 a -49 (debería ir a -50)
-  for (float t = 0; t < N; t++){
-    //(1-t)(p1x,p1y) + t*(p2x,p2y)
-    x[0] = (1-t/N) * p1x + (t/N) * p2x;
-    x[1] = (1-t/N) * p1y + (t/N) * p2y;
-    x[2] = 20;
-
-    Serial.print(x[0]);
-    Serial.print(" ");
-    Serial.print(x[1]);
-    Serial.print(" ");
-    Serial.print(x[2]);
-    Serial.println();
-
-    cinematicaInversa(x, q);
-
-    q[0] = q[0];
-    q[1] = q[1];
-    q[2] = -(PI-q[2]);
-    q[3] = PI-q[3];
-
-    q[0] = q[0] + PI/2; //map(q[i], -90, 90, 0, 180);
-    q[2] = q[2] + PI/2;
-    q[3] = q[3] + PI/2;
-
-    Serial.print("ITERACION:");
-    Serial.println(t);
-
-    //ESCRIBIR LOS ANGULOS EN EL SERVOMOTOR
-    servosArticulaciones(10);
-
-    Serial.println();
-  }*/
