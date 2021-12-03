@@ -40,7 +40,10 @@ void handleDraw(){
     x=server.arg(0).toInt();
     y=server.arg(1).toInt();
     s=server.arg(3).toInt();
-    
+    dibujoX = x;
+    dibujoY = y;
+    dibujoTamanio = s;
+    dibujoTipo = server.arg(2);
     if(server.arg(2) == "triangle"){
       h2 = sqrt(3) * s/4;
       if(CHECKSIZE) msg = "Espacio insuficiente";

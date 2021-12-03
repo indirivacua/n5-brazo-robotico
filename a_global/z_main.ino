@@ -14,4 +14,16 @@ void setup(){
 void loop(){
   //Atender requests del servidor web
   server.handleClient();
+  if (!armAvailable){
+    dibujoX += orgX;
+    dibujoY += orgY;
+    if (dibujoTipo == "circle"){
+      dibujarCirculo(dibujoX,dibujoY,LP,dibujoTamanio);
+    } else if (dibujoTipo == "square"){
+      dibujarCuadrado(dibujoX,dibujoY,dibujoTamanio);
+    } else if (dibujoTipo == "triangle"){
+      dibujarTriangulo(dibujoX,dibujoY,dibujoTamanio);
+    }
+    armAvailable = true;
+  }
 }
