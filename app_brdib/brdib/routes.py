@@ -111,9 +111,13 @@ from flask import request
 @app.route('/board', methods=["POST", "GET"])
 @login_required
 def board_page():
-    if request.method == "POST":
-        coordX = request.form["coordX"]
-        coordY = request.form["coordY"]
-        print(coordX)
-        print(coordY)
+    if "form-submit-guardar" in request.form:
+        if request.method == "POST":
+            coordX = request.form["coordXguardar"]
+            coordY = request.form["coordYguardar"]
+            print(coordX)
+            print(coordY)
+    else:
+        if "form-submit-imprimir" in request.form:
+            print("Hola")
     return render_template('board.html')

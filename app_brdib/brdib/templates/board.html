@@ -42,14 +42,23 @@
         <div class="container-fluid">
             <ul class="nav justify-content-end">
                 <li class="nav-item">
-                    <a href="#" class="btn btn-light mr-2">Imprimir dibujo</a>
+                    <!--<a href="#" class="btn btn-light mr-2">Imprimir dibujo</a>-->
+                    <!--formulario de IMPRIMIR-->
+                    <form action="#" method="post">
+                        <!--usar type="text" para debug-->
+                        <input type="text" name="coordXimprimir" id="coordXimprimir_inp" />
+                        <input type="text" name="coordYimprimir" id="coordYimprimir_inp" />
+                        <p><input name="form-submit-imprimir" type="submit" value="Imprimir dibujo" class="btn btn-light mr-2"/></p>
+                    </form>
                 </li>
                 <li class="nav-item">
                     <!--<a href="#" class="btn btn-light mr-2">Guardar dibujo</a>-->
+                    <!--formulario de GUARDAR-->
                     <form action="#" method="post">
-                        <p><input type="hidden" name="coordX" id="coordXinp" /></p>
-                        <p><input type="hidden" name="coordY" id="coordYinp" /></p>
-                        <p><input type="submit" value="Guardar dibujo" class="btn btn-light mr-2"/></p>
+                        <!--usar type="text" para debug-->
+                        <input type="text" name="coordXguardar" id="coordXguardar_inp" />
+                        <input type="text" name="coordYguardar" id="coordYguardar_inp" />
+                        <p><input name="form-submit-guardar" type="submit" value="Guardar dibujo" class="btn btn-light mr-2"/></p>
                     </form>
                 </li>
             </ul>
@@ -137,6 +146,13 @@ var app = new Vue({
 
             this.defPosX = x;//e.clientX;
             this.defPosY = y;//e.clientY;
+
+            document.getElementById("coordXimprimir_inp").value = x;
+            document.getElementById("coordYimprimir_inp").value = y;
+
+            document.getElementById("coordXguardar_inp").value = x;
+            document.getElementById("coordYguardar_inp").value = y;
+
             console.log(e.clientX,e.clientY);
             this.ctx.strokeRect(this.defPosX,this.defPosY,this.actSize,this.actSize);           // (x,y,w,h)
         },
@@ -164,6 +180,13 @@ var app = new Vue({
 
             this.defPosX = x;//e.clientX;
             this.defPosY = y;//e.clientY;
+
+            document.getElementById("coordXimprimir_inp").value = x;
+            document.getElementById("coordYimprimir_inp").value = y;
+
+            document.getElementById("coordXguardar_inp").value = x;
+            document.getElementById("coordYguardar_inp").value = y;
+
             console.log(e.clientX,e.clientY);
             this.ctx.beginPath();
             this.ctx.moveTo(this.defPosX,this.defPosY);
@@ -197,8 +220,11 @@ var app = new Vue({
             this.defPosX = x;//e.clientX;
             this.defPosY = y;//e.clientY;
 
-            document.getElementById("coordXinp").value = x;
-            document.getElementById("coordYinp").value = y;
+            document.getElementById("coordXimprimir_inp").value = x;
+            document.getElementById("coordYimprimir_inp").value = y;
+
+            document.getElementById("coordXguardar_inp").value = x;
+            document.getElementById("coordYguardar_inp").value = y;
 
             console.log(e.clientX,e.clientY);
             this.ctx.beginPath();
