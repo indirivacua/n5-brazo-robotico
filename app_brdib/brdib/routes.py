@@ -115,6 +115,7 @@ def logout_page():
 
 from flask import request
 from brdib.models import Drawing
+import requests
 
 # Página de Pizarra
 @app.route('/board', methods=["POST", "GET"])
@@ -135,13 +136,38 @@ def board_page():
             db.session.add(dibujo)
             db.session.commit()
             flash("Dibujo guardado correctamente!", category='success')
+            return redirect(url_for('board_page')) #agregado para que desaparezcan los parámetros de la url
     else:
         if "form-submit-imprimir" in request.form:
             coordX = request.form["imprimir_coordX"]
             coordY = request.form["imprimir_coordY"]
             figura = request.form["imprimir_figura"]
             tamanio = request.form["imprimir_tamanio"]
+            ventanaAlto = request.form["imprimir_ventanaAlto"]
+            ventanaAncho = request.form["imprimir_ventanaAncho"]
             print("FORM IMPRIMIR board_page")
-            print(coordX, coordY, figura, tamanio)
+            print(coordX, coordY, figura, tamanio, ventanaAlto, ventanaAncho)
+
+            #r = requests.get('http://192.168.4.1/dimensions')
+            #print(r.content) #x:30,y:70
+
+            if figura == "circulo":
+                figura = "circle"
+            elif figura == "triangulo": #como la novela turca xd
+                figura = "triangle"
+            elif figura == "cuadrado":
+                figura = "square"
+
+            tamanio = int(int(tamanio)/10)
+
+            coordX = int(70 - int(coordX)/10)
+            coordY = int(30 - int(coordY)/10)
+
+            print(f'192.168.4.1/draw?posX={coordY}&posY={coordX}&shape={figura}&size={tamanio}')
+
+            #r = requests.get(f'192.168.4.1/draw?posX={coordY}&posY={coordX}&shape={figura}&size={tamanio}')
+            #print(r.content)
+
             flash("Dibujo enviado a imprimir correctamente!", category='success')
+            return redirect(url_for('board_page')) #agregado para que desaparezcan los parámetros de la url
     return render_template('board.html', coordX=request.args.get('coordX'), coordY=request.args.get('coordY'), figura=request.args.get('figura'), tamanio=request.args.get('tamanio')) # hubo que agregar todos los parámetros

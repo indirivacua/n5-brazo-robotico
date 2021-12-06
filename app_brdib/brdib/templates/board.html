@@ -74,7 +74,7 @@
 {% endwith %}
 <!-- PIZARRA ------------------------------------------------------------------------------------------------------------------------------------------------------->
 <div id="app" class="text-center">
-    <canvas @mousedown="drawFigura" id="canvas"></canvas>
+    <canvas @mousedown="drawFigura" id="canvas" style="outline-style: solid; outline-color: red; margin-top: 10px;"></canvas>
     <!-- NAVBAR INFERIOR ------------------------------------------------------------------------------------------------------------------------------------------->
     <nav class="navbar fixed-bottom navbar-dark bg-dark">
         <div class="container-fluid">
@@ -84,10 +84,12 @@
                     <!--formulario de IMPRIMIR-->
                     <form action="#" method="post">
                         <!--usar type="text" para debug-->
-                        <input type="text" name="imprimir_coordX" id="imprimir_coordX_inp" />
-                        <input type="text" name="imprimir_coordY" id="imprimir_coordY_inp" />
-                        <input type="text" name="imprimir_figura" id="imprimir_figura_inp" />
-                        <input type="text" name="imprimir_tamanio" id="imprimir_tamanio_inp" />
+                        <input type="hidden" name="imprimir_coordX" id="imprimir_coordX_inp" />
+                        <input type="hidden" name="imprimir_coordY" id="imprimir_coordY_inp" />
+                        <input type="hidden" name="imprimir_figura" id="imprimir_figura_inp" />
+                        <input type="hidden" name="imprimir_tamanio" id="imprimir_tamanio_inp" />
+                        <input type="hidden" name="imprimir_ventanaAlto" id="imprimir_ventanaAlto_inp" />
+                        <input type="hidden" name="imprimir_ventanaAncho" id="imprimir_ventanaAncho_inp" />
                         <p><input name="form-submit-imprimir" type="submit" value="Imprimir dibujo" class="btn btn-light mr-2"/></p>
                     </form>
                 </li>
@@ -96,10 +98,10 @@
                     <!--formulario de GUARDAR-->
                     <form action="#" method="post">
                         <!--usar type="text" para debug-->
-                        <input type="text" name="guardar_coordX" id="guardar_coordX_inp" />
-                        <input type="text" name="guardar_coordY" id="guardar_coordY_inp" />
-                        <input type="text" name="guardar_figura" id="guardar_figura_inp" />
-                        <input type="text" name="guardar_tamanio" id="guardar_tamanio_inp" />
+                        <input type="hidden" name="guardar_coordX" id="guardar_coordX_inp" />
+                        <input type="hidden" name="guardar_coordY" id="guardar_coordY_inp" />
+                        <input type="hidden" name="guardar_figura" id="guardar_figura_inp" />
+                        <input type="hidden" name="guardar_tamanio" id="guardar_tamanio_inp" />
                         <p><input name="form-submit-guardar" type="submit" value="Guardar dibujo" class="btn btn-light mr-2"/></p>
                     </form>
                 </li>
@@ -167,13 +169,16 @@ var app = new Vue({
         this.ctx = canvas.getContext("2d");
 
         // Definir tamaño de pizarra
-        this.canvas.height = window.innerHeight;
-        this.canvas.width = window.innerWidth;
+        this.canvas.height = 300//window.innerHeight;
+        this.canvas.width = 700//window.innerWidth;
 
         // Configurar color, formato y grosor del lápiz
         this.ctx.lineWidth = 4;
         this.ctx.lineCap ="round"
         this.ctx.strokeStyle = "black"
+
+        document.getElementById("imprimir_ventanaAlto_inp").value = this.canvas.height;
+        document.getElementById("imprimir_ventanaAncho_inp").value = this.canvas.width;
 
         coordX={{coordX}}
         coordY={{coordY}}
@@ -232,7 +237,9 @@ var app = new Vue({
             document.getElementById("imprimir_figura_inp").value = this.figura;
             document.getElementById("imprimir_tamanio_inp").value = this.actSize;
 
-            console.log(e.clientX,e.clientY);
+            //console.log(e.clientX,e.clientY);
+            console.log(this.defPosX, this.defPosY)
+
             this.ctx.strokeRect(this.defPosX,this.defPosY,this.actSize,this.actSize);           // (x,y,w,h)
         },
         initSqr(e) {
@@ -243,12 +250,12 @@ var app = new Vue({
         },
         incSqr(e) {
             this.resetCanvas();
-            this.actSize = this.actSize + 5;
+            this.actSize = this.actSize + this.value;
             //this.drawSqr(e);
         },
         decSqr(e) {
             this.resetCanvas();
-            this.actSize = this.actSize - 5;
+            this.actSize = this.actSize - this.value;
             //this.drawSqr(e);
         },
         // Función que realiza el dibujo del triangulo según las dimensiones indicadas
@@ -270,7 +277,9 @@ var app = new Vue({
             document.getElementById("imprimir_figura_inp").value = this.figura;
             document.getElementById("imprimir_tamanio_inp").value = this.actOff;
 
-            console.log(e.clientX,e.clientY);
+            //console.log(e.clientX,e.clientY);
+            console.log(this.defPosX, this.defPosY)
+
             this.ctx.beginPath();
             this.ctx.moveTo(this.defPosX,this.defPosY);
             this.ctx.lineTo(this.defPosX+this.actOff,this.defPosY);
@@ -313,7 +322,9 @@ var app = new Vue({
             document.getElementById("imprimir_figura_inp").value = this.figura;
             document.getElementById("imprimir_tamanio_inp").value = this.actRad;
 
-            console.log(e.clientX,e.clientY);
+            //console.log(e.clientX,e.clientY);
+            console.log(this.defPosX, this.defPosY)
+
             this.ctx.beginPath();
             //this.ctx.arc(X, Y, R, 0, 2 * Math.PI, false);
             this.ctx.arc(this.defPosX, this.defPosY, this.actRad, 0, 2 * Math.PI, false);
