@@ -18,4 +18,6 @@ login_manager.login_message_category = 'info'
 login_manager.login_message = \
     'Debes iniciar sesión para acceder a esta página.'
 
+
+
 from brdib import routes                        # Importa el archivo routes.py del paquete brdib

@@ -36,4 +36,4 @@ class Drawing(db.Model):
     type = db.Column(db.Integer(), nullable=False)
     size = db.Column(db.Integer(), nullable=False)
 
-
+db.create_all() #AGREGADO

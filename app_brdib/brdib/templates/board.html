@@ -36,7 +36,7 @@
 </nav>
 <!-- PIZARRA ------------------------------------------------------------------------------------------------------------------------------------------------------->
 <div id="app" class="text-center">
-    <canvas id="canvas"></canvas>
+    <canvas @mousedown="drawFigura" id="canvas"></canvas>
     <!-- NAVBAR INFERIOR ------------------------------------------------------------------------------------------------------------------------------------------->
     <nav class="navbar fixed-bottom navbar-dark bg-dark">
         <div class="container-fluid">
@@ -92,9 +92,10 @@ var app = new Vue({
         canvas:null,
         ctx:null,
         value:10,
+        figura:"nula",
         // Posicion predeterminada
-        defPosX:window.innerWidth/2,
-        defPosY:window.innerHeight/2,
+        //defPosX:window.innerWidth/2,
+        //defPosY:window.innerHeight/2,
         // Parametros de Cuadrado
         defSize:100,
         actSize:0,
@@ -125,12 +126,15 @@ var app = new Vue({
         },
         // Función que realiza el dibujo del cuadrado según las dimensiones indicadas
         drawSqr(e) {
+            this.defPosX = e.clientX;
+            this.defPosY = e.clientY;
             this.ctx.strokeRect(this.defPosX,this.defPosY,this.actSize,this.actSize);           // (x,y,w,h)
         },
         initSqr(e) {
             this.resetCanvas();
             this.actSize = this.defSize;
-            this.drawSqr(e);
+            this.figura = "cuadrado";
+            //this.drawSqr(e);
         },
         incSqr(e) {
             this.resetCanvas();
@@ -144,6 +148,8 @@ var app = new Vue({
         },
         // Función que realiza el dibujo del triangulo según las dimensiones indicadas
         drawTri(e) {
+            this.defPosX = e.clientX;
+            this.defPosY = e.clientY;
             this.ctx.beginPath();
             this.ctx.moveTo(this.defPosX,this.defPosY);
             this.ctx.lineTo(this.defPosX+this.actOff,this.defPosY);
@@ -154,7 +160,8 @@ var app = new Vue({
         initTri(e) {
             this.resetCanvas();
             this.actOff = this.defOff;
-            this.drawTri(e);
+            this.figura = "triangulo";
+            //this.drawTri(e);
         },
         incTri(e) {
             this.resetCanvas();
@@ -168,6 +175,8 @@ var app = new Vue({
         },
         // Función que realiza el dibujo del circulo según las dimensiones indicadas
         drawCir(e) {
+            this.defPosX = e.clientX;
+            this.defPosY = e.clientY;
             this.ctx.beginPath();
             //this.ctx.arc(X, Y, R, 0, 2 * Math.PI, false);
             this.ctx.arc(this.defPosX, this.defPosY, this.actRad, 0, 2 * Math.PI, false);
@@ -176,7 +185,8 @@ var app = new Vue({
         initCir(e) {
             this.resetCanvas();
             this.actRad = this.defRad;
-            this.drawCir(e);
+            this.figura = "circulo";
+            //this.drawCir(e);
         },
         incCir(e) {
             this.resetCanvas();
@@ -187,6 +197,16 @@ var app = new Vue({
             this.resetCanvas();
             this.actRad = this.actRad - this.value;
             this.drawCir(e);
+        },
+        drawFigura(e){
+            console.log(this.figura);
+            if (this.figura == "circulo"){
+                this.drawCir(e);
+            } else if (this.figura == "triangulo") {
+                this.drawTri(e);
+            } else if (this.figura == "cuadrado") {
+                this.drawSqr(e);
+            }
         },
     }
 })
