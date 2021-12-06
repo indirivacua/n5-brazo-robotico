@@ -105,9 +105,15 @@ def logout_page():
     flash('Cerraste sesión correctamente.', category='info')
     return redirect(url_for('root_page'))
 
+from flask import request
 
 # Página de Pizarra
-@app.route('/board')
+@app.route('/board', methods=["POST", "GET"])
 @login_required
 def board_page():
+    if request.method == "POST":
+        coordX = request.form["coordX"]
+        coordY = request.form["coordY"]
+        print(coordX)
+        print(coordY)
     return render_template('board.html')

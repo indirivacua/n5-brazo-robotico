@@ -45,7 +45,12 @@
                     <a href="#" class="btn btn-light mr-2">Imprimir dibujo</a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="btn btn-light mr-2">Guardar dibujo</a>
+                    <!--<a href="#" class="btn btn-light mr-2">Guardar dibujo</a>-->
+                    <form action="#" method="post">
+                        <p><input type="hidden" name="coordX" id="coordXinp" /></p>
+                        <p><input type="hidden" name="coordY" id="coordYinp" /></p>
+                        <p><input type="submit" value="Guardar dibujo" class="btn btn-light mr-2"/></p>
+                    </form>
                 </li>
             </ul>
             <ul class="nav justify-content-right">
@@ -126,8 +131,13 @@ var app = new Vue({
         },
         // Función que realiza el dibujo del cuadrado según las dimensiones indicadas
         drawSqr(e) {
-            this.defPosX = e.clientX;
-            this.defPosY = e.clientY;
+            const rect = document.getElementById("canvas").getBoundingClientRect()
+            const x = event.clientX - rect.left
+            const y = event.clientY - rect.top
+
+            this.defPosX = x;//e.clientX;
+            this.defPosY = y;//e.clientY;
+            console.log(e.clientX,e.clientY);
             this.ctx.strokeRect(this.defPosX,this.defPosY,this.actSize,this.actSize);           // (x,y,w,h)
         },
         initSqr(e) {
@@ -148,8 +158,13 @@ var app = new Vue({
         },
         // Función que realiza el dibujo del triangulo según las dimensiones indicadas
         drawTri(e) {
-            this.defPosX = e.clientX;
-            this.defPosY = e.clientY;
+            const rect = document.getElementById("canvas").getBoundingClientRect()
+            const x = event.clientX - rect.left
+            const y = event.clientY - rect.top
+
+            this.defPosX = x;//e.clientX;
+            this.defPosY = y;//e.clientY;
+            console.log(e.clientX,e.clientY);
             this.ctx.beginPath();
             this.ctx.moveTo(this.defPosX,this.defPosY);
             this.ctx.lineTo(this.defPosX+this.actOff,this.defPosY);
@@ -179,9 +194,13 @@ var app = new Vue({
             const x = event.clientX - rect.left
             const y = event.clientY - rect.top
 
-
             this.defPosX = x;//e.clientX;
             this.defPosY = y;//e.clientY;
+
+            document.getElementById("coordXinp").value = x;
+            document.getElementById("coordYinp").value = y;
+
+            console.log(e.clientX,e.clientY);
             this.ctx.beginPath();
             //this.ctx.arc(X, Y, R, 0, 2 * Math.PI, false);
             this.ctx.arc(this.defPosX, this.defPosY, this.actRad, 0, 2 * Math.PI, false);
@@ -206,7 +225,6 @@ var app = new Vue({
         drawFigura(e){
             this.resetCanvas();
             console.log(this.figura);
-            console.log(e.clientX,e.clientY);
             if (this.figura == "circulo"){
                 this.drawCir(e);
             } else if (this.figura == "triangulo") {
