@@ -174,6 +174,29 @@ var app = new Vue({
         this.ctx.lineWidth = 4;
         this.ctx.lineCap ="round"
         this.ctx.strokeStyle = "black"
+
+        coordX={{coordX}}
+        coordY={{coordY}}
+        figura="{{figura}}"
+        tamanio={{tamanio}}
+        console.log(coordX,coordY,figura,tamanio)
+
+        if (figura == "circulo"){
+            this.ctx.beginPath();
+            //this.ctx.arc(X, Y, R, 0, 2 * Math.PI, false);
+            this.ctx.arc(coordX, coordY, tamanio, 0, 2 * Math.PI, false);
+            this.ctx.stroke();
+        } else if (figura == "triangulo") {
+            this.ctx.beginPath();
+            this.ctx.moveTo(coordX,coordY);
+            this.ctx.lineTo(coordX+tamanio,coordY);
+            this.ctx.lineTo(coordX+(tamanio/2),coordY-tamanio);
+            this.ctx.closePath();
+            this.ctx.stroke();
+        } else if (figura == "cuadrado") {
+            this.ctx.strokeRect(coordX,coordY,tamanio,tamanio);
+        }
+
     },
     methods: {
         // Función que limpia la pizzarra

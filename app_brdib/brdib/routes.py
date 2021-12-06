@@ -16,10 +16,17 @@ def root_page():
 
 
 # Página Principal (con sesión activa)
-@app.route('/home')
+@app.route('/home', methods=["POST", "GET"])
 @login_required
 def home_page():
-    return render_template('home.html')
+    if request.method == 'POST':
+        if "dibujo-pizarra" in request.form:
+            id_dibujo = request.form["dibujo-pizarra"]
+            dibujo = Drawing.query.filter_by(id=id_dibujo).first()
+            print("HOLA home_page")
+            print(dibujo.x, dibujo.y, dibujo.type, dibujo.size)
+            return render_template('board.html', coordX=dibujo.x, coordY=dibujo.y, figura=dibujo.type, tamanio=dibujo.size)
+    return render_template('home.html', dibujos=Drawing.query.all())
 
 
 # Página de Registro
@@ -118,12 +125,14 @@ def board_page():
             coordY = request.form["guardar_coordY"]
             figura = request.form["guardar_figura"]
             tamanio = request.form["guardar_tamanio"]
-            print("FORM GUARDAR")
+            print("FORM GUARDAR board_page")
             #print(coordX, coordY, figura, tamanio)
             print(int(coordX), int(coordY), figura, int(tamanio))
             dibujo = Drawing(session['username'], int(coordX), int(coordY), figura, int(tamanio))
             #print(type(coordX), type(coordY), type(figura), type(tamanio))
             print(type(int(coordX)), type(int(coordY)), type(figura), type(int(tamanio)))
+            db.session.add(dibujo)
+            db.session.commit()
             flash("Dibujo guardado correctamente!", category='success')
     else:
         if "form-submit-imprimir" in request.form:
@@ -131,7 +140,7 @@ def board_page():
             coordY = request.form["imprimir_coordY"]
             figura = request.form["imprimir_figura"]
             tamanio = request.form["imprimir_tamanio"]
-            print("FORM IMPRIMIR")
+            print("FORM IMPRIMIR board_page")
             print(coordX, coordY, figura, tamanio)
             flash("Dibujo enviado a imprimir correctamente!", category='success')
     return render_template('board.html')
