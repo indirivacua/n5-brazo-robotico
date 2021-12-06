@@ -94,8 +94,8 @@ var app = new Vue({
         value:10,
         figura:"nula",
         // Posicion predeterminada
-        //defPosX:window.innerWidth/2,
-        //defPosY:window.innerHeight/2,
+        defPosX:window.innerWidth/2,
+        defPosY:window.innerHeight/2,
         // Parametros de Cuadrado
         defSize:100,
         actSize:0,
@@ -139,12 +139,12 @@ var app = new Vue({
         incSqr(e) {
             this.resetCanvas();
             this.actSize = this.actSize + 5;
-            this.drawSqr(e);
+            //this.drawSqr(e);
         },
         decSqr(e) {
             this.resetCanvas();
             this.actSize = this.actSize - 5;
-            this.drawSqr(e);
+            //this.drawSqr(e);
         },
         // Función que realiza el dibujo del triangulo según las dimensiones indicadas
         drawTri(e) {
@@ -166,17 +166,22 @@ var app = new Vue({
         incTri(e) {
             this.resetCanvas();
             this.actOff = this.actOff + this.value;
-            this.drawTri(e);
+            //this.drawTri(e);
         },
         decTri(e) {
             this.resetCanvas();
             this.actOff = this.actOff - this.value;
-            this.drawTri(e);
+            //this.drawTri(e);
         },
         // Función que realiza el dibujo del circulo según las dimensiones indicadas
         drawCir(e) {
-            this.defPosX = e.clientX;
-            this.defPosY = e.clientY;
+            const rect = document.getElementById("canvas").getBoundingClientRect()
+            const x = event.clientX - rect.left
+            const y = event.clientY - rect.top
+
+
+            this.defPosX = x;//e.clientX;
+            this.defPosY = y;//e.clientY;
             this.ctx.beginPath();
             //this.ctx.arc(X, Y, R, 0, 2 * Math.PI, false);
             this.ctx.arc(this.defPosX, this.defPosY, this.actRad, 0, 2 * Math.PI, false);
@@ -191,15 +196,17 @@ var app = new Vue({
         incCir(e) {
             this.resetCanvas();
             this.actRad = this.actRad + this.value;
-            this.drawCir(e);
+            //this.drawCir(e);
         },
         decCir(e) {
             this.resetCanvas();
             this.actRad = this.actRad - this.value;
-            this.drawCir(e);
+            //this.drawCir(e);
         },
         drawFigura(e){
+            this.resetCanvas();
             console.log(this.figura);
+            console.log(e.clientX,e.clientY);
             if (this.figura == "circulo"){
                 this.drawCir(e);
             } else if (this.figura == "triangulo") {
