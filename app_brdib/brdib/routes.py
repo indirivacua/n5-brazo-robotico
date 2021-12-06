@@ -143,10 +143,9 @@ def board_page():
             coordY = request.form["imprimir_coordY"]
             figura = request.form["imprimir_figura"]
             tamanio = request.form["imprimir_tamanio"]
-            ventanaAlto = request.form["imprimir_ventanaAlto"]
-            ventanaAncho = request.form["imprimir_ventanaAncho"]
+
             print("FORM IMPRIMIR board_page")
-            print(coordX, coordY, figura, tamanio, ventanaAlto, ventanaAncho)
+            print(coordX, coordY, figura, tamanio)
 
             #r = requests.get('http://192.168.4.1/dimensions')
             #print(r.content) #x:30,y:70
