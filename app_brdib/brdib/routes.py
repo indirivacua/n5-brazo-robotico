@@ -106,6 +106,7 @@ def logout_page():
     return redirect(url_for('root_page'))
 
 from flask import request
+from brdib.models import Drawing
 
 # Página de Pizarra
 @app.route('/board', methods=["POST", "GET"])
@@ -113,11 +114,24 @@ from flask import request
 def board_page():
     if "form-submit-guardar" in request.form:
         if request.method == "POST":
-            coordX = request.form["coordXguardar"]
-            coordY = request.form["coordYguardar"]
-            print(coordX)
-            print(coordY)
+            coordX = request.form["guardar_coordX"]
+            coordY = request.form["guardar_coordY"]
+            figura = request.form["guardar_figura"]
+            tamanio = request.form["guardar_tamanio"]
+            print("FORM GUARDAR")
+            #print(coordX, coordY, figura, tamanio)
+            print(int(coordX), int(coordY), figura, int(tamanio))
+            dibujo = Drawing(session['username'], int(coordX), int(coordY), figura, int(tamanio))
+            #print(type(coordX), type(coordY), type(figura), type(tamanio))
+            print(type(int(coordX)), type(int(coordY)), type(figura), type(int(tamanio)))
+            flash("Dibujo guardado correctamente!", category='success')
     else:
         if "form-submit-imprimir" in request.form:
-            print("Hola")
+            coordX = request.form["imprimir_coordX"]
+            coordY = request.form["imprimir_coordY"]
+            figura = request.form["imprimir_figura"]
+            tamanio = request.form["imprimir_tamanio"]
+            print("FORM IMPRIMIR")
+            print(coordX, coordY, figura, tamanio)
+            flash("Dibujo enviado a imprimir correctamente!", category='success')
     return render_template('board.html')
