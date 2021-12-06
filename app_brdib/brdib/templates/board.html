@@ -84,10 +84,10 @@
                     <!--formulario de IMPRIMIR-->
                     <form action="#" method="post">
                         <!--usar type="text" para debug-->
-                        <input type="hidden" name="imprimir_coordX" id="imprimir_coordX_inp" />
-                        <input type="hidden" name="imprimir_coordY" id="imprimir_coordY_inp" />
-                        <input type="hidden" name="imprimir_figura" id="imprimir_figura_inp" />
-                        <input type="hidden" name="imprimir_tamanio" id="imprimir_tamanio_inp" />
+                        <input type="text" name="imprimir_coordX" id="imprimir_coordX_inp" />
+                        <input type="text" name="imprimir_coordY" id="imprimir_coordY_inp" />
+                        <input type="text" name="imprimir_figura" id="imprimir_figura_inp" />
+                        <input type="text" name="imprimir_tamanio" id="imprimir_tamanio_inp" />
                         <p><input name="form-submit-imprimir" type="submit" value="Imprimir dibujo" class="btn btn-light mr-2"/></p>
                     </form>
                 </li>
@@ -96,10 +96,10 @@
                     <!--formulario de GUARDAR-->
                     <form action="#" method="post">
                         <!--usar type="text" para debug-->
-                        <input type="hidden" name="guardar_coordX" id="guardar_coordX_inp" />
-                        <input type="hidden" name="guardar_coordY" id="guardar_coordY_inp" />
-                        <input type="hidden" name="guardar_figura" id="guardar_figura_inp" />
-                        <input type="hidden" name="guardar_tamanio" id="guardar_tamanio_inp" />
+                        <input type="text" name="guardar_coordX" id="guardar_coordX_inp" />
+                        <input type="text" name="guardar_coordY" id="guardar_coordY_inp" />
+                        <input type="text" name="guardar_figura" id="guardar_figura_inp" />
+                        <input type="text" name="guardar_tamanio" id="guardar_tamanio_inp" />
                         <p><input name="form-submit-guardar" type="submit" value="Guardar dibujo" class="btn btn-light mr-2"/></p>
                     </form>
                 </li>
@@ -196,6 +196,16 @@ var app = new Vue({
         } else if (figura == "cuadrado") {
             this.ctx.strokeRect(coordX,coordY,tamanio,tamanio);
         }
+
+        document.getElementById("guardar_coordX_inp").value = {{coordX}};
+        document.getElementById("guardar_coordY_inp").value = {{coordY}};
+        document.getElementById("guardar_figura_inp").value = "{{figura}}";
+        document.getElementById("guardar_tamanio_inp").value = {{tamanio}};
+
+        document.getElementById("imprimir_coordX_inp").value = {{coordX}};
+        document.getElementById("imprimir_coordY_inp").value = {{coordY}};
+        document.getElementById("imprimir_figura_inp").value = "{{figura}}";
+        document.getElementById("imprimir_tamanio_inp").value = {{tamanio}};
 
     },
     methods: {
