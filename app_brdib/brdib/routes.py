@@ -147,8 +147,8 @@ def board_page():
             print("FORM IMPRIMIR board_page")
             print(coordX, coordY, figura, tamanio)
 
-            #r = requests.get('http://192.168.4.1/dimensions')
-            #print(r.content) #x:30,y:70
+            r = requests.get('http://192.168.4.1/dimensions')
+            print(r.content) #x:30,y:70
 
             if figura == "circulo":
                 figura = "circle"
@@ -157,16 +157,21 @@ def board_page():
             elif figura == "cuadrado":
                 figura = "square"
 
-            tamanio = int(int(tamanio)/10)
+            if coordX != "":
+                tamanio = int(int(tamanio)/10)
 
-            coordX = int(70 - int(coordX)/10)
-            coordY = int(30 - int(coordY)/10)
+                coordX = int(70 - int(coordX)/10)
+                coordY = int(30 - int(coordY)/10)
 
-            print(f'192.168.4.1/draw?posX={coordY}&posY={coordX}&shape={figura}&size={tamanio}')
+                print(f'192.168.4.1/draw?posX={coordY}&posY={coordX}&shape={figura}&size={tamanio}')
 
-            #r = requests.get(f'192.168.4.1/draw?posX={coordY}&posY={coordX}&shape={figura}&size={tamanio}')
-            #print(r.content)
+                ploads = {'posX':coordY,'posY':coordX,'shape':figura,'size':tamanio}
+                #r = requests.get(f'192.168.4.1/draw?posX={coordY}&posY={coordX}&shape={figura}&size={tamanio}')
+                r = requests.get(f'http://192.168.4.1/draw?',params=ploads)
+                print(r.content)
+			
+                flash(r.content, category='info')
 
-            flash("Dibujo enviado a imprimir correctamente!", category='success')
+                flash("Dibujo enviado a imprimir correctamente!", category='success')
             return redirect(url_for('board_page')) #agregado para que desaparezcan los parámetros de la url
     return render_template('board.html', coordX=request.args.get('coordX'), coordY=request.args.get('coordY'), figura=request.args.get('figura'), tamanio=request.args.get('tamanio')) # hubo que agregar todos los parámetros
