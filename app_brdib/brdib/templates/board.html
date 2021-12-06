@@ -192,14 +192,24 @@ var app = new Vue({
             this.ctx.arc(coordX, coordY, tamanio, 0, 2 * Math.PI, false);
             this.ctx.stroke();
         } else if (figura == "triangulo") {
-            this.ctx.beginPath();
+            /*this.ctx.beginPath();
             this.ctx.moveTo(coordX,coordY);
             this.ctx.lineTo(coordX+tamanio,coordY);
             this.ctx.lineTo(coordX+(tamanio/2),coordY-tamanio);
             this.ctx.closePath();
+            this.ctx.stroke();*/
+            tam2 = Math.round(tamanio/2)
+            h2 = Math.round(0.43301270189*tamanio) //sqrt(3)/4 = 0.43301270189
+            this.ctx.beginPath();
+            this.ctx.moveTo(coordX-tam2,coordY+h2);
+            this.ctx.lineTo(coordX+tam2,coordY+h2);
+            this.ctx.lineTo(coordX,coordY-h2);
+            this.ctx.lineTo(coordX-tam2,coordY+h2);
+            this.ctx.closePath();
             this.ctx.stroke();
         } else if (figura == "cuadrado") {
-            this.ctx.strokeRect(coordX,coordY,tamanio,tamanio);
+            //this.ctx.strokeRect(coordX,coordY,tamanio,tamanio);
+            this.ctx.strokeRect(coordX-tamanio/2,coordY-tamanio/2,tamanio,tamanio);
         }
 
         document.getElementById("guardar_coordX_inp").value = {{coordX}};
@@ -240,7 +250,8 @@ var app = new Vue({
             //console.log(e.clientX,e.clientY);
             console.log(this.defPosX, this.defPosY)
 
-            this.ctx.strokeRect(this.defPosX,this.defPosY,this.actSize,this.actSize);           // (x,y,w,h)
+            //this.ctx.strokeRect(this.defPosX,this.defPosY,this.actSize,this.actSize);           // (x,y,w,h)
+            this.ctx.strokeRect(this.defPosX-this.actSize/2,this.defPosY-this.actSize/2,this.actSize,this.actSize);
         },
         initSqr(e) {
             this.resetCanvas();
@@ -280,10 +291,19 @@ var app = new Vue({
             //console.log(e.clientX,e.clientY);
             console.log(this.defPosX, this.defPosY)
 
-            this.ctx.beginPath();
+            /*this.ctx.beginPath();
             this.ctx.moveTo(this.defPosX,this.defPosY);
             this.ctx.lineTo(this.defPosX+this.actOff,this.defPosY);
             this.ctx.lineTo(this.defPosX+(this.actOff/2),this.defPosY-this.actOff);
+            this.ctx.closePath();
+            this.ctx.stroke();*/
+            tam2 = Math.round(this.actOff/2)
+            h2 = Math.round(0.43301270189*this.actOff) //sqrt(3)/4 = 0.43301270189
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.defPosX-tam2,this.defPosY+h2);
+            this.ctx.lineTo(this.defPosX+tam2,this.defPosY+h2);
+            this.ctx.lineTo(this.defPosX,this.defPosY-h2);
+            this.ctx.lineTo(this.defPosX-tam2,this.defPosY+h2);
             this.ctx.closePath();
             this.ctx.stroke();
         },

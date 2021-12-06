@@ -1,0 +1,9 @@
+Flask
+SQLAlchemy
+Flask-SQLAlchemy
+Flask-Bcrypt
+Flask-Login
+Flask-Session
+Flask-WTF
+email-validator
+requests
