@@ -15,18 +15,20 @@ BRD - Página Principal
       <th scope="col">#</th>
       <th scope="col">Usuario</th>
       <th scope="col">Figura</th>
+      <th scope="col">Fecha</th>
       <th scope="col">Acciones</th>
     </tr>
   </thead>
   <tbody>
-    {% for item in dibujos %}
+    {% for item in drawings %}
       <tr>
         <th scope="row">{{item.id}}</th>
         <td>{{item.user_id}}</td>
         <td>{{item.type}}</td>
+        <td>{{item.created_date}}</td>
         <td>
           <form method="post" action="#">
-            <button type="submit" class="btn btn-warning" name="dibujo-pizarra" value="{{item.id}}">Verlo en la pizarra</button>
+            <button type="submit" class="btn btn-warning" name="form-submit-board" value="{{item.id}}">Verlo en la pizarra</button>
           </form>
         </td>
       </tr>

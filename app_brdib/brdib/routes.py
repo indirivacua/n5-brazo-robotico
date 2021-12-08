@@ -20,14 +20,15 @@ def root_page():
 @login_required
 def home_page():
     if request.method == 'POST':
-        if "dibujo-pizarra" in request.form:
-            id_dibujo = request.form["dibujo-pizarra"]
-            dibujo = Drawing.query.filter_by(id=id_dibujo).first()
-            print("HOLA home_page")
-            print(dibujo.x, dibujo.y, dibujo.type, dibujo.size)
-            #return render_template('board.html', coordX=dibujo.x, coordY=dibujo.y, figura=dibujo.type, tamanio=dibujo.size)
-            return redirect(url_for("board_page", coordX=dibujo.x, coordY=dibujo.y, figura=dibujo.type, tamanio=dibujo.size)) # redirect y no render porque sino se estaría simulando que estamos en board... (no andaría ningún botón)
-    return render_template('home.html', dibujos=Drawing.query.all())
+        if "form-submit-board" in request.form:
+            draw_id = request.form["form-submit-board"] # obtiene el valor del atributo "value="
+            draw = Drawing.query.filter_by(id=draw_id).first()
+
+            print("FORM BOARD home_page")
+            print(draw.x, draw.y, draw.type, draw.size)
+
+            return redirect(url_for("board_page", defPosX=draw.x, defPosY=draw.y, type=draw.type, size=draw.size)) # redirect y no render porque sino se estaría simulando que estamos en board... (no andaría ningún botón)
+    return render_template('home.html', drawings=Drawing.query.all())
 
 
 # Página de Registro
@@ -121,50 +122,45 @@ import requests
 @app.route('/board', methods=["POST", "GET"])
 @login_required
 def board_page():
-    if "form-submit-guardar" in request.form:
-        if request.method == "POST":
-            coordX = request.form["guardar_coordX"]
-            coordY = request.form["guardar_coordY"]
-            figura = request.form["guardar_figura"]
-            tamanio = request.form["guardar_tamanio"]
-            print("FORM GUARDAR board_page")
-            #print(coordX, coordY, figura, tamanio)
-            print(int(coordX), int(coordY), figura, int(tamanio))
-            dibujo = Drawing(session['username'], int(coordX), int(coordY), figura, int(tamanio))
-            #print(type(coordX), type(coordY), type(figura), type(tamanio))
-            print(type(int(coordX)), type(int(coordY)), type(figura), type(int(tamanio)))
-            db.session.add(dibujo)
-            db.session.commit()
-            flash("Dibujo guardado correctamente!", category='success')
-            return redirect(url_for('board_page')) #agregado para que desaparezcan los parámetros de la url
-    else:
-        if "form-submit-imprimir" in request.form:
-            coordX = request.form["imprimir_coordX"]
-            coordY = request.form["imprimir_coordY"]
-            figura = request.form["imprimir_figura"]
-            tamanio = request.form["imprimir_tamanio"]
+    if request.method == "POST":
+        if "form-submit-save" in request.form:
+            defPosX = request.form["save_defPosX"]
+            defPosY = request.form["save_defPosY"]
+            type = request.form["save_type"]
+            size = request.form["save_size"]
 
-            print("FORM IMPRIMIR board_page")
-            print(coordX, coordY, figura, tamanio)
+            print("FORM SAVE board_page")
+            print(int(defPosX), int(defPosY), type, int(size))
+
+            draw = Drawing(session['username'], int(defPosX), int(defPosY), type, int(size))
+
+
+            db.session.add(draw)
+            db.session.commit()
+
+            flash("Dibujo guardado correctamente!", category='success')
+
+            return redirect(url_for('board_page')) # agregado para que desaparezcan los parámetros de la url
+        elif "form-submit-print" in request.form:
+            defPosX = request.form["print_defPosX"]
+            defPosY = request.form["print_defPosY"]
+            type = request.form["print_type"]
+            size = request.form["print_size"]
+
+            print("FORM PRINT board_page")
+            print(defPosX, defPosY, type, size)
 
             #r = requests.get('http://192.168.4.1/dimensions')
             #print(r.content) #x:30,y:70
 
-            if figura == "circulo":
-                figura = "circle"
-            elif figura == "triangulo": #como la novela turca xd
-                figura = "triangle"
-            elif figura == "cuadrado":
-                figura = "square"
+            if defPosX != "":
+                size = int(int(size)/10)
 
-            if coordX != "":
-                tamanio = int(int(tamanio)/10)
-
-                coordX = int(70 - int(coordX)/10)
-                coordY = int(30 - int(coordY)/10)
+                defPosX = int(70 - int(defPosX)/10)
+                defPosY = int(30 - int(defPosY)/10)
 
                 try:
-                    ploads = {'posX':coordY,'posY':coordX,'shape':figura,'size':tamanio}
+                    ploads = {'posX':defPosY,'posY':defPosX,'shape':type,'size':size}
                     r = requests.get('http://192.168.4.1/draw?', params=ploads)
                     print(r.content)
                     flash(r.content, category='info')
@@ -174,5 +170,5 @@ def board_page():
             else:
                 flash("No se puede imprimir un dibujo vacio!", category="danger")
 
-            return redirect(url_for('board_page')) #agregado para que desaparezcan los parámetros de la url
-    return render_template('board.html', coordX=request.args.get('coordX'), coordY=request.args.get('coordY'), figura=request.args.get('figura'), tamanio=request.args.get('tamanio')) # hubo que agregar todos los parámetros
+            return redirect(url_for('board_page')) # agregado para que desaparezcan los parámetros de la url
+    return render_template('board.html', defPosX=request.args.get('defPosX'), defPosY=request.args.get('defPosY'), type=request.args.get('type'), size=request.args.get('size')) # hubo que agregar todos los parámetros

@@ -37,7 +37,7 @@ class Drawing(db.Model):
     y = db.Column(db.Integer(), nullable=False)
     type = db.Column(db.String(100), nullable=False) #type = db.Column(db.Integer(), nullable=False)
     size = db.Column(db.Integer(), nullable=False)
-    #created_date = db.Column(db.DateTime(), default=datetime.datetime.utcnow, nullable=False)
+    created_date = db.Column(db.DateTime(), default=datetime.datetime.now, nullable=False)
 
     def __init__(self, user_id, x, y, type, size):
         self.user_id = user_id
@@ -45,7 +45,6 @@ class Drawing(db.Model):
         self.y = y
         self.type = type
         self.size = size
-        #self.created_date = datetime.datetime.now()
-        #print(self.user_id,self.x,self.y,self.type,self.size,self.created_date)
+        print(self.user_id,self.x,self.y,self.type,self.size,self.created_date)
 
 db.create_all() #AGREGADO

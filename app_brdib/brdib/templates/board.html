@@ -74,33 +74,33 @@
 {% endwith %}
 <!-- PIZARRA ------------------------------------------------------------------------------------------------------------------------------------------------------->
 <div id="app" class="text-center">
-    <canvas @mousedown="drawFigura" id="canvas" style="outline-style: solid; outline-color: red; margin-top: 10px;"></canvas>
+    <canvas @mousedown="drawFigure" id="canvas" style="outline-style: solid; outline-color: red; margin-top: 10px;"></canvas>
     <!-- NAVBAR INFERIOR ------------------------------------------------------------------------------------------------------------------------------------------->
     <nav class="navbar fixed-bottom navbar-dark bg-dark">
         <div class="container-fluid">
             <ul class="nav justify-content-end">
                 <li class="nav-item">
                     <!--<a href="#" class="btn btn-light mr-2">Imprimir dibujo</a>-->
-                    <!--formulario de IMPRIMIR-->
+                    <!--FORMULARIO DE IMPRIMIR-->
                     <form action="#" method="post">
                         <!--usar type="text" para debug-->
-                        <input type="hidden" name="imprimir_coordX" id="imprimir_coordX_inp" />
-                        <input type="hidden" name="imprimir_coordY" id="imprimir_coordY_inp" />
-                        <input type="hidden" name="imprimir_figura" id="imprimir_figura_inp" />
-                        <input type="hidden" name="imprimir_tamanio" id="imprimir_tamanio_inp" />
-                        <p><input name="form-submit-imprimir" type="submit" value="Imprimir dibujo" class="btn btn-light mr-2"/></p>
+                        <input type="hidden" name="print_defPosX" id="print_defPosX_inp" />
+                        <input type="hidden" name="print_defPosY" id="print_defPosY_inp" />
+                        <input type="hidden" name="print_type" id="print_type_inp" />
+                        <input type="hidden" name="print_size" id="print_size_inp" />
+                        <p><input name="form-submit-print" type="submit" value="Imprimir dibujo" class="btn btn-light mr-2"/></p>
                     </form>
                 </li>
                 <li class="nav-item">
                     <!--<a href="#" class="btn btn-light mr-2">Guardar dibujo</a>-->
-                    <!--formulario de GUARDAR-->
+                    <!--FORMULARIO DE GUARDAR-->
                     <form action="#" method="post">
                         <!--usar type="text" para debug-->
-                        <input type="hidden" name="guardar_coordX" id="guardar_coordX_inp" />
-                        <input type="hidden" name="guardar_coordY" id="guardar_coordY_inp" />
-                        <input type="hidden" name="guardar_figura" id="guardar_figura_inp" />
-                        <input type="hidden" name="guardar_tamanio" id="guardar_tamanio_inp" />
-                        <p><input name="form-submit-guardar" type="submit" value="Guardar dibujo" class="btn btn-light mr-2"/></p>
+                        <input type="hidden" name="save_defPosX" id="save_defPosX_inp" />
+                        <input type="hidden" name="save_defPosY" id="save_defPosY_inp" />
+                        <input type="hidden" name="save_type" id="save_type_inp" />
+                        <input type="hidden" name="save_size" id="save_size_inp" />
+                        <p><input name="form-submit-save" type="submit" value="Guardar dibujo" class="btn btn-light mr-2"/></p>
                     </form>
                 </li>
             </ul>
@@ -148,7 +148,7 @@ var app = new Vue({
         canvas:null,
         ctx:null,
         value:10,
-        figura:"nula",
+        type:null,
         // Posicion predeterminada
         defPosX:window.innerWidth/2,
         defPosY:window.innerHeight/2,
@@ -167,55 +167,55 @@ var app = new Vue({
         this.ctx = canvas.getContext("2d");
 
         // Definir tamaño de pizarra
-        this.canvas.height = 300//window.innerHeight;
-        this.canvas.width = 700//window.innerWidth;
+        this.canvas.width = 700; //window.innerWidth;
+        this.canvas.height = 300; //window.innerHeight;
 
         // Configurar color, formato y grosor del lápiz
         this.ctx.lineWidth = 4;
         this.ctx.lineCap ="round"
         this.ctx.strokeStyle = "black"
 
-        coordX={{coordX}}
-        coordY={{coordY}}
-        figura="{{figura}}"
-        tamanio={{tamanio}}
-        console.log(coordX,coordY,figura,tamanio)
+        if ("{{defPosX}}" != "None") {
+            defPosX={{defPosX}}
+            defPosY={{defPosY}}
+            type="{{type}}"
+            size={{size}}
+            console.log(defPosX,defPosY,type,size)
 
-        if (figura == "circulo"){
-            this.ctx.beginPath();
-            //this.ctx.arc(X, Y, R, 0, 2 * Math.PI, false);
-            this.ctx.arc(coordX, coordY, tamanio, 0, 2 * Math.PI, false);
-            this.ctx.stroke();
-        } else if (figura == "triangulo") {
-            /*this.ctx.beginPath();
-            this.ctx.moveTo(coordX,coordY);
-            this.ctx.lineTo(coordX+tamanio,coordY);
-            this.ctx.lineTo(coordX+(tamanio/2),coordY-tamanio);
-            this.ctx.closePath();
-            this.ctx.stroke();*/
-            tam2 = Math.round(tamanio/2)
-            h2 = Math.round(0.43301270189*tamanio) //sqrt(3)/4 = 0.43301270189
-            this.ctx.beginPath();
-            this.ctx.moveTo(coordX-tam2,coordY+h2);
-            this.ctx.lineTo(coordX+tam2,coordY+h2);
-            this.ctx.lineTo(coordX,coordY-h2);
-            this.ctx.lineTo(coordX-tam2,coordY+h2);
-            this.ctx.closePath();
-            this.ctx.stroke();
-        } else if (figura == "cuadrado") {
-            //this.ctx.strokeRect(coordX,coordY,tamanio,tamanio);
-            this.ctx.strokeRect(coordX-tamanio/2,coordY-tamanio/2,tamanio,tamanio);
+            switch(type) {
+                case "circle":
+                    this.ctx.beginPath();
+                    this.ctx.arc(defPosX, defPosY, size, 0, 2 * Math.PI, false);
+                    this.ctx.stroke();
+                    break
+                case "triangle":
+                    tam2 = Math.round(size/2)
+                    h2 = Math.round(0.43301270189*size) //sqrt(3)/4 = 0.43301270189
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(defPosX-tam2,defPosY+h2);
+                    this.ctx.lineTo(defPosX+tam2,defPosY+h2);
+                    this.ctx.lineTo(defPosX,defPosY-h2);
+                    this.ctx.lineTo(defPosX-tam2,defPosY+h2);
+                    this.ctx.closePath();
+                    this.ctx.stroke();
+                    break
+                case "square":
+                    this.ctx.strokeRect(defPosX-size/2,defPosY-size/2,size,size);
+                    break
+                default:
+                    break
+            }
+
+            document.getElementById("save_defPosX_inp").value = {{defPosX}};
+            document.getElementById("save_defPosY_inp").value = {{defPosY}};
+            document.getElementById("save_type_inp").value = "{{type}}";
+            document.getElementById("save_size_inp").value = {{size}};
+
+            document.getElementById("print_defPosX_inp").value = {{defPosX}};
+            document.getElementById("print_defPosY_inp").value = {{defPosY}};
+            document.getElementById("print_type_inp").value = "{{type}}";
+            document.getElementById("print_size_inp").value = {{size}};
         }
-
-        document.getElementById("guardar_coordX_inp").value = {{coordX}};
-        document.getElementById("guardar_coordY_inp").value = {{coordY}};
-        document.getElementById("guardar_figura_inp").value = "{{figura}}";
-        document.getElementById("guardar_tamanio_inp").value = {{tamanio}};
-
-        document.getElementById("imprimir_coordX_inp").value = {{coordX}};
-        document.getElementById("imprimir_coordY_inp").value = {{coordY}};
-        document.getElementById("imprimir_figura_inp").value = "{{figura}}";
-        document.getElementById("imprimir_tamanio_inp").value = {{tamanio}};
 
     },
     methods: {
@@ -229,40 +229,35 @@ var app = new Vue({
             const x = event.clientX - rect.left
             const y = event.clientY - rect.top
 
-            this.defPosX = x;//e.clientX;
-            this.defPosY = y;//e.clientY;
+            this.defPosX = x;
+            this.defPosY = y;
 
-            document.getElementById("guardar_coordX_inp").value = x;
-            document.getElementById("guardar_coordY_inp").value = y;
-            document.getElementById("guardar_figura_inp").value = this.figura;
-            document.getElementById("guardar_tamanio_inp").value = this.actSize;
+            document.getElementById("save_defPosX_inp").value = this.defPosX;
+            document.getElementById("save_defPosY_inp").value = this.defPosY;
+            document.getElementById("save_type_inp").value = this.type;
+            document.getElementById("save_size_inp").value = this.actSize;
 
-            document.getElementById("imprimir_coordX_inp").value = x;
-            document.getElementById("imprimir_coordY_inp").value = y;
-            document.getElementById("imprimir_figura_inp").value = this.figura;
-            document.getElementById("imprimir_tamanio_inp").value = this.actSize;
+            document.getElementById("print_defPosX_inp").value = this.defPosX;
+            document.getElementById("print_defPosY_inp").value = this.defPosY;
+            document.getElementById("print_type_inp").value = this.type;
+            document.getElementById("print_size_inp").value = this.actSize;
 
-            //console.log(e.clientX,e.clientY);
             console.log(this.defPosX, this.defPosY)
 
-            //this.ctx.strokeRect(this.defPosX,this.defPosY,this.actSize,this.actSize);           // (x,y,w,h)
-            this.ctx.strokeRect(this.defPosX-this.actSize/2,this.defPosY-this.actSize/2,this.actSize,this.actSize);
+            this.ctx.strokeRect(this.defPosX-this.actSize/2,this.defPosY-this.actSize/2,this.actSize,this.actSize); // (x,y,w,h)
         },
         initSqr(e) {
             this.resetCanvas();
             this.actSize = this.defSize;
-            this.figura = "cuadrado";
-            //this.drawSqr(e);
+            this.type = "square";
         },
         incSqr(e) {
             this.resetCanvas();
             this.actSize = this.actSize + this.value;
-            //this.drawSqr(e);
         },
         decSqr(e) {
             this.resetCanvas();
             this.actSize = this.actSize - this.value;
-            //this.drawSqr(e);
         },
         // Función que realiza el dibujo del triangulo según las dimensiones indicadas
         drawTri(e) {
@@ -270,28 +265,21 @@ var app = new Vue({
             const x = event.clientX - rect.left
             const y = event.clientY - rect.top
 
-            this.defPosX = x;//e.clientX;
-            this.defPosY = y;//e.clientY;
+            this.defPosX = x;
+            this.defPosY = y;
 
-            document.getElementById("guardar_coordX_inp").value = x;
-            document.getElementById("guardar_coordY_inp").value = y;
-            document.getElementById("guardar_figura_inp").value = this.figura;
-            document.getElementById("guardar_tamanio_inp").value = this.actOff;
+            document.getElementById("save_defPosX_inp").value = this.defPosX;
+            document.getElementById("save_defPosY_inp").value = this.defPosY;
+            document.getElementById("save_type_inp").value = this.type;
+            document.getElementById("save_size_inp").value = this.actOff;
 
-            document.getElementById("imprimir_coordX_inp").value = x;
-            document.getElementById("imprimir_coordY_inp").value = y;
-            document.getElementById("imprimir_figura_inp").value = this.figura;
-            document.getElementById("imprimir_tamanio_inp").value = this.actOff;
+            document.getElementById("print_defPosX_inp").value = this.defPosX;
+            document.getElementById("print_defPosY_inp").value = this.defPosY;
+            document.getElementById("print_type_inp").value = this.type;
+            document.getElementById("print_size_inp").value = this.actOff;
 
-            //console.log(e.clientX,e.clientY);
             console.log(this.defPosX, this.defPosY)
 
-            /*this.ctx.beginPath();
-            this.ctx.moveTo(this.defPosX,this.defPosY);
-            this.ctx.lineTo(this.defPosX+this.actOff,this.defPosY);
-            this.ctx.lineTo(this.defPosX+(this.actOff/2),this.defPosY-this.actOff);
-            this.ctx.closePath();
-            this.ctx.stroke();*/
             tam2 = Math.round(this.actOff/2)
             h2 = Math.round(0.43301270189*this.actOff) //sqrt(3)/4 = 0.43301270189
             this.ctx.beginPath();
@@ -305,18 +293,15 @@ var app = new Vue({
         initTri(e) {
             this.resetCanvas();
             this.actOff = this.defOff;
-            this.figura = "triangulo";
-            //this.drawTri(e);
+            this.type = "triangle";
         },
         incTri(e) {
             this.resetCanvas();
             this.actOff = this.actOff + this.value;
-            //this.drawTri(e);
         },
         decTri(e) {
             this.resetCanvas();
             this.actOff = this.actOff - this.value;
-            //this.drawTri(e);
         },
         // Función que realiza el dibujo del circulo según las dimensiones indicadas
         drawCir(e) {
@@ -324,53 +309,54 @@ var app = new Vue({
             const x = event.clientX - rect.left
             const y = event.clientY - rect.top
 
-            this.defPosX = x;//e.clientX;
-            this.defPosY = y;//e.clientY;
+            this.defPosX = x;
+            this.defPosY = y;
 
-            document.getElementById("guardar_coordX_inp").value = x;
-            document.getElementById("guardar_coordY_inp").value = y;
-            document.getElementById("guardar_figura_inp").value = this.figura;
-            document.getElementById("guardar_tamanio_inp").value = this.actRad;
+            document.getElementById("save_defPosX_inp").value = this.defPosX;
+            document.getElementById("save_defPosY_inp").value = this.defPosY;
+            document.getElementById("save_type_inp").value = this.type;
+            document.getElementById("save_size_inp").value = this.actRad;
 
-            document.getElementById("imprimir_coordX_inp").value = x;
-            document.getElementById("imprimir_coordY_inp").value = y;
-            document.getElementById("imprimir_figura_inp").value = this.figura;
-            document.getElementById("imprimir_tamanio_inp").value = this.actRad;
+            document.getElementById("print_defPosX_inp").value = this.defPosX;
+            document.getElementById("print_defPosY_inp").value = this.defPosY;
+            document.getElementById("print_type_inp").value = this.type;
+            document.getElementById("print_size_inp").value = this.actRad;
 
-            //console.log(e.clientX,e.clientY);
             console.log(this.defPosX, this.defPosY)
 
             this.ctx.beginPath();
-            //this.ctx.arc(X, Y, R, 0, 2 * Math.PI, false);
             this.ctx.arc(this.defPosX, this.defPosY, this.actRad, 0, 2 * Math.PI, false);
             this.ctx.stroke();
         },
         initCir(e) {
             this.resetCanvas();
             this.actRad = this.defRad;
-            this.figura = "circulo";
-            //this.drawCir(e);
+            this.type = "circle";
         },
         incCir(e) {
             this.resetCanvas();
             this.actRad = this.actRad + this.value;
-            //this.drawCir(e);
         },
         decCir(e) {
             this.resetCanvas();
             this.actRad = this.actRad - this.value;
-            //this.drawCir(e);
         },
-        drawFigura(e){
+        drawFigure(e){
             this.resetCanvas();
-            console.log(this.figura);
-            if (this.figura == "circulo"){
-                this.drawCir(e);
-            } else if (this.figura == "triangulo") {
-                this.drawTri(e);
-            } else if (this.figura == "cuadrado") {
-                this.drawSqr(e);
-            }
+            console.log(this.type);
+            switch(this.type) {
+				case "circle":
+					this.drawCir(e);
+					break
+				case "triangle":
+					this.drawTri(e);
+					break
+				case "square":
+					this.drawSqr(e);
+					break
+				default:
+					break
+			}
         },
     }
 })
