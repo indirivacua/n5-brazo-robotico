@@ -84,8 +84,8 @@
                     <!--FORMULARIO DE IMPRIMIR-->
                     <form action="#" method="post">
                         <!--usar type="text" para debug-->
-                        <input type="hidden" name="print_defPosX" id="print_defPosX_inp" />
-                        <input type="hidden" name="print_defPosY" id="print_defPosY_inp" />
+                        <input type="hidden" name="print_posX" id="print_posX_inp" />
+                        <input type="hidden" name="print_posY" id="print_posY_inp" />
                         <input type="hidden" name="print_type" id="print_type_inp" />
                         <input type="hidden" name="print_size" id="print_size_inp" />
                         <p><input name="form-submit-print" type="submit" value="Imprimir dibujo" class="btn btn-light mr-2"/></p>
@@ -96,8 +96,8 @@
                     <!--FORMULARIO DE GUARDAR-->
                     <form action="#" method="post">
                         <!--usar type="text" para debug-->
-                        <input type="hidden" name="save_defPosX" id="save_defPosX_inp" />
-                        <input type="hidden" name="save_defPosY" id="save_defPosY_inp" />
+                        <input type="hidden" name="save_posX" id="save_posX_inp" />
+                        <input type="hidden" name="save_posY" id="save_posY_inp" />
                         <input type="hidden" name="save_type" id="save_type_inp" />
                         <input type="hidden" name="save_size" id="save_size_inp" />
                         <p><input name="form-submit-save" type="submit" value="Guardar dibujo" class="btn btn-light mr-2"/></p>
@@ -108,6 +108,7 @@
                 <li class="nav-item">
                     <div class="btn-group" role="group" aria-label="Basic example">
                       <button type="button" class="btn btn-primary" @click="initCir">CIR</button>
+                      <div id="btn-counter-cir" class="btn btn-light" style="pointer-events: none; width: 60px !important;"></div>
                       <button type="button" class="btn btn-light" @click="incCir">+</button>
                       <button type="button" class="btn btn-light mr-2" @click="decCir">-</button>
                     </div>
@@ -115,6 +116,7 @@
                 <li class="nav-item">
                     <div class="btn-group" role="group" aria-label="Basic example">
                       <button type="button" class="btn btn-primary" @click="initTri">TRI</button>
+                      <div id="btn-counter-tri" class="btn btn-light" style="pointer-events: none; width: 60px !important;"></div>
                       <button type="button" class="btn btn-light" @click="incTri">+</button>
                       <button type="button" class="btn btn-light mr-2" @click="decTri">-</button>
                     </div>
@@ -122,6 +124,7 @@
                 <li class="nav-item">
                     <div class="btn-group" role="group" aria-label="Basic example">
                       <button type="button" class="btn btn-primary" @click="initSqr">CUA</button>
+                      <div id="btn-counter-sqr" class="btn btn-light" style="pointer-events: none; width: 60px !important;"></div>
                       <button type="button" class="btn btn-light" @click="incSqr">+</button>
                       <button type="button" class="btn btn-light mr-2" @click="decSqr">-</button>
                     </div>
@@ -147,11 +150,13 @@ var app = new Vue({
         vueCanvas:null,
         canvas:null,
         ctx:null,
+        // Valor de incremento de tamaño
         value:10,
+        // Tipo de figura
         type:null,
-        // Posicion predeterminada
-        defPosX:window.innerWidth/2,
-        defPosY:window.innerHeight/2,
+        // Parametros para la posicion
+        posX:0,
+        posY:0,
         // Parametros de Cuadrado
         defSize:100,
         actSize:0,
@@ -175,47 +180,51 @@ var app = new Vue({
         this.ctx.lineCap ="round"
         this.ctx.strokeStyle = "black"
 
-        if ("{{defPosX}}" != "None") {
-            defPosX={{defPosX}}
-            defPosY={{defPosY}}
+        if ("{{posX}}" != "None") {
+            posX={{posX}}
+            posY={{posY}}
             type="{{type}}"
             size={{size}}
-            console.log(defPosX,defPosY,type,size)
+            console.log(posX,posY,type,size)
 
             switch(type) {
                 case "circle":
                     this.ctx.beginPath();
-                    this.ctx.arc(defPosX, defPosY, size, 0, 2 * Math.PI, false);
+                    this.ctx.arc(posX, posY, size, 0, 2 * Math.PI, false);
                     this.ctx.stroke();
                     break
                 case "triangle":
                     tam2 = Math.round(size/2)
                     h2 = Math.round(0.43301270189*size) //sqrt(3)/4 = 0.43301270189
                     this.ctx.beginPath();
-                    this.ctx.moveTo(defPosX-tam2,defPosY+h2);
-                    this.ctx.lineTo(defPosX+tam2,defPosY+h2);
-                    this.ctx.lineTo(defPosX,defPosY-h2);
-                    this.ctx.lineTo(defPosX-tam2,defPosY+h2);
+                    this.ctx.moveTo(posX-tam2,posY+h2);
+                    this.ctx.lineTo(posX+tam2,posY+h2);
+                    this.ctx.lineTo(posX,posY-h2);
+                    this.ctx.lineTo(posX-tam2,posY+h2);
                     this.ctx.closePath();
                     this.ctx.stroke();
                     break
                 case "square":
-                    this.ctx.strokeRect(defPosX-size/2,defPosY-size/2,size,size);
+                    this.ctx.strokeRect(posX-size/2,posY-size/2,size,size);
                     break
                 default:
                     break
             }
 
-            document.getElementById("save_defPosX_inp").value = {{defPosX}};
-            document.getElementById("save_defPosY_inp").value = {{defPosY}};
+            document.getElementById("save_posX_inp").value = {{posX}};
+            document.getElementById("save_posY_inp").value = {{posY}};
             document.getElementById("save_type_inp").value = "{{type}}";
             document.getElementById("save_size_inp").value = {{size}};
 
-            document.getElementById("print_defPosX_inp").value = {{defPosX}};
-            document.getElementById("print_defPosY_inp").value = {{defPosY}};
+            document.getElementById("print_posX_inp").value = {{posX}};
+            document.getElementById("print_posY_inp").value = {{posY}};
             document.getElementById("print_type_inp").value = "{{type}}";
             document.getElementById("print_size_inp").value = {{size}};
         }
+
+        document.getElementById("btn-counter-sqr").innerHTML = this.defSize;
+        document.getElementById("btn-counter-tri").innerHTML = this.defOff;
+        document.getElementById("btn-counter-cir").innerHTML = this.defRad;
 
     },
     methods: {
@@ -229,35 +238,38 @@ var app = new Vue({
             const x = event.clientX - rect.left
             const y = event.clientY - rect.top
 
-            this.defPosX = x;
-            this.defPosY = y;
+            this.posX = x;
+            this.posY = y;
 
-            document.getElementById("save_defPosX_inp").value = this.defPosX;
-            document.getElementById("save_defPosY_inp").value = this.defPosY;
+            document.getElementById("save_posX_inp").value = this.posX;
+            document.getElementById("save_posY_inp").value = this.posY;
             document.getElementById("save_type_inp").value = this.type;
             document.getElementById("save_size_inp").value = this.actSize;
 
-            document.getElementById("print_defPosX_inp").value = this.defPosX;
-            document.getElementById("print_defPosY_inp").value = this.defPosY;
+            document.getElementById("print_posX_inp").value = this.posX;
+            document.getElementById("print_posY_inp").value = this.posY;
             document.getElementById("print_type_inp").value = this.type;
             document.getElementById("print_size_inp").value = this.actSize;
 
-            console.log(this.defPosX, this.defPosY)
+            console.log(this.posX, this.posY)
 
-            this.ctx.strokeRect(this.defPosX-this.actSize/2,this.defPosY-this.actSize/2,this.actSize,this.actSize); // (x,y,w,h)
+            this.ctx.strokeRect(this.posX-this.actSize/2,this.posY-this.actSize/2,this.actSize,this.actSize); // (x,y,w,h)
         },
         initSqr(e) {
             this.resetCanvas();
             this.actSize = this.defSize;
             this.type = "square";
+            document.getElementById("btn-counter-sqr").innerHTML = this.actSize;
         },
         incSqr(e) {
             this.resetCanvas();
             this.actSize = this.actSize + this.value;
+            document.getElementById("btn-counter-sqr").innerHTML = this.actSize;
         },
         decSqr(e) {
             this.resetCanvas();
             this.actSize = this.actSize - this.value;
+            document.getElementById("btn-counter-sqr").innerHTML = this.actSize;
         },
         // Función que realiza el dibujo del triangulo según las dimensiones indicadas
         drawTri(e) {
@@ -265,28 +277,28 @@ var app = new Vue({
             const x = event.clientX - rect.left
             const y = event.clientY - rect.top
 
-            this.defPosX = x;
-            this.defPosY = y;
+            this.posX = x;
+            this.posY = y;
 
-            document.getElementById("save_defPosX_inp").value = this.defPosX;
-            document.getElementById("save_defPosY_inp").value = this.defPosY;
+            document.getElementById("save_posX_inp").value = this.posX;
+            document.getElementById("save_posY_inp").value = this.posY;
             document.getElementById("save_type_inp").value = this.type;
             document.getElementById("save_size_inp").value = this.actOff;
 
-            document.getElementById("print_defPosX_inp").value = this.defPosX;
-            document.getElementById("print_defPosY_inp").value = this.defPosY;
+            document.getElementById("print_posX_inp").value = this.posX;
+            document.getElementById("print_posY_inp").value = this.posY;
             document.getElementById("print_type_inp").value = this.type;
             document.getElementById("print_size_inp").value = this.actOff;
 
-            console.log(this.defPosX, this.defPosY)
+            console.log(this.posX, this.posY)
 
             tam2 = Math.round(this.actOff/2)
             h2 = Math.round(0.43301270189*this.actOff) //sqrt(3)/4 = 0.43301270189
             this.ctx.beginPath();
-            this.ctx.moveTo(this.defPosX-tam2,this.defPosY+h2);
-            this.ctx.lineTo(this.defPosX+tam2,this.defPosY+h2);
-            this.ctx.lineTo(this.defPosX,this.defPosY-h2);
-            this.ctx.lineTo(this.defPosX-tam2,this.defPosY+h2);
+            this.ctx.moveTo(this.posX-tam2,this.posY+h2);
+            this.ctx.lineTo(this.posX+tam2,this.posY+h2);
+            this.ctx.lineTo(this.posX,this.posY-h2);
+            this.ctx.lineTo(this.posX-tam2,this.posY+h2);
             this.ctx.closePath();
             this.ctx.stroke();
         },
@@ -294,14 +306,17 @@ var app = new Vue({
             this.resetCanvas();
             this.actOff = this.defOff;
             this.type = "triangle";
+            document.getElementById("btn-counter-tri").innerHTML = this.actOff;
         },
         incTri(e) {
             this.resetCanvas();
             this.actOff = this.actOff + this.value;
+            document.getElementById("btn-counter-tri").innerHTML = this.actOff;
         },
         decTri(e) {
             this.resetCanvas();
             this.actOff = this.actOff - this.value;
+            document.getElementById("btn-counter-tri").innerHTML = this.actOff;
         },
         // Función que realiza el dibujo del circulo según las dimensiones indicadas
         drawCir(e) {
@@ -309,37 +324,40 @@ var app = new Vue({
             const x = event.clientX - rect.left
             const y = event.clientY - rect.top
 
-            this.defPosX = x;
-            this.defPosY = y;
+            this.posX = x;
+            this.posY = y;
 
-            document.getElementById("save_defPosX_inp").value = this.defPosX;
-            document.getElementById("save_defPosY_inp").value = this.defPosY;
+            document.getElementById("save_posX_inp").value = this.posX;
+            document.getElementById("save_posY_inp").value = this.posY;
             document.getElementById("save_type_inp").value = this.type;
             document.getElementById("save_size_inp").value = this.actRad;
 
-            document.getElementById("print_defPosX_inp").value = this.defPosX;
-            document.getElementById("print_defPosY_inp").value = this.defPosY;
+            document.getElementById("print_posX_inp").value = this.posX;
+            document.getElementById("print_posY_inp").value = this.posY;
             document.getElementById("print_type_inp").value = this.type;
             document.getElementById("print_size_inp").value = this.actRad;
 
-            console.log(this.defPosX, this.defPosY)
+            console.log(this.posX, this.posY)
 
             this.ctx.beginPath();
-            this.ctx.arc(this.defPosX, this.defPosY, this.actRad, 0, 2 * Math.PI, false);
+            this.ctx.arc(this.posX, this.posY, this.actRad, 0, 2 * Math.PI, false);
             this.ctx.stroke();
         },
         initCir(e) {
             this.resetCanvas();
             this.actRad = this.defRad;
             this.type = "circle";
+            document.getElementById("btn-counter-cir").innerHTML = this.actRad;
         },
         incCir(e) {
             this.resetCanvas();
             this.actRad = this.actRad + this.value;
+            document.getElementById("btn-counter-cir").innerHTML = this.actRad;
         },
         decCir(e) {
             this.resetCanvas();
             this.actRad = this.actRad - this.value;
+            document.getElementById("btn-counter-cir").innerHTML = this.actRad;
         },
         drawFigure(e){
             this.resetCanvas();
