@@ -134,7 +134,6 @@ def board_page():
 
             draw = Drawing(session['username'], int(posX), int(posY), type, int(size))
 
-
             db.session.add(draw)
             db.session.commit()
 
@@ -149,6 +148,14 @@ def board_page():
 
             print("FORM PRINT board_page")
             print(posX, posY, type, size)
+
+            # cuando se imprime también se debe guardar
+            draw = Drawing(session['username'], int(posX), int(posY), type, int(size))
+
+            db.session.add(draw)
+            db.session.commit()
+
+            flash("Dibujo guardado correctamente!", category='success')
 
             #r = requests.get('http://192.168.4.1/dimensions')
             #print(r.content) #x:30,y:70
@@ -172,3 +179,23 @@ def board_page():
 
             return redirect(url_for('board_page')) # agregado para que desaparezcan los parámetros de la url
     return render_template('board.html', posX=request.args.get('posX'), posY=request.args.get('posY'), type=request.args.get('type'), size=request.args.get('size')) # hubo que agregar todos los parámetros
+
+# Página de Mis Dibujos
+@app.route('/mydrawings', methods=["POST", "GET"])
+@login_required
+def mydrawings_page():
+    if request.method == 'POST':
+        if "form-submit-board" in request.form:
+            draw_id = request.form["form-submit-board"] # obtiene el valor del atributo "value="
+            draw = Drawing.query.filter_by(id=draw_id).first()
+
+            print("FORM BOARD mydrawings_page")
+            print(draw.x, draw.y, draw.type, draw.size)
+
+            return redirect(url_for("board_page", posX=draw.x, posY=draw.y, type=draw.type, size=draw.size)) # redirect y no render porque sino se estaría simulando que estamos en board... (no andaría ningún botón)
+        elif "form-submit-delete" in request.form:
+            draw_id = request.form["form-submit-delete"]
+            Drawing.query.filter_by(id=draw_id).delete()
+            db.session.commit()
+            flash("Se borró el dibujo correctamente!", category="success")
+    return render_template('mydrawings.html', drawings=Drawing.query.filter_by(user_id=session['username']))

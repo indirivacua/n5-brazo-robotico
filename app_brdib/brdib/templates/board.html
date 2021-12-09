@@ -23,7 +23,7 @@
                     {{ current_user.username }}
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                    <li><a class="dropdown-item" href="#">Mis dibujos</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('mydrawings_page') }}">Mis dibujos</a></li>
                     <li><a class="dropdown-item" href="{{ url_for('settings_page') }}">Configuración</a></li>
                     <li><a class="dropdown-item" href="{{ url_for('logout_page') }}">Cerrar sesión</a></li>
                 </ul>
@@ -268,7 +268,8 @@ var app = new Vue({
         },
         decSqr(e) {
             this.resetCanvas();
-            this.actSize = this.actSize - this.value;
+            if (this.actSize > 0)
+                this.actSize = this.actSize - this.value;
             document.getElementById("btn-counter-sqr").innerHTML = this.actSize;
         },
         // Función que realiza el dibujo del triangulo según las dimensiones indicadas
@@ -315,7 +316,8 @@ var app = new Vue({
         },
         decTri(e) {
             this.resetCanvas();
-            this.actOff = this.actOff - this.value;
+            if (this.actOff > 0)
+                this.actOff = this.actOff - this.value;
             document.getElementById("btn-counter-tri").innerHTML = this.actOff;
         },
         // Función que realiza el dibujo del circulo según las dimensiones indicadas
@@ -356,7 +358,8 @@ var app = new Vue({
         },
         decCir(e) {
             this.resetCanvas();
-            this.actRad = this.actRad - this.value;
+            if (this.actRad > 0)
+                this.actRad = this.actRad - this.value;
             document.getElementById("btn-counter-cir").innerHTML = this.actRad;
         },
         drawFigure(e){

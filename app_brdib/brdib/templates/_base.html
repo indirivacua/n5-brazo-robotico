@@ -46,7 +46,7 @@
                         {{ current_user.username }}
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                        <li><a class="dropdown-item" href="#">Mis dibujos</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('mydrawings_page') }}">Mis dibujos</a></li>
                         <li><a class="dropdown-item" href="{{ url_for('settings_page') }}">Configuración</a></li>
                         <li><a class="dropdown-item" href="{{ url_for('logout_page') }}">Cerrar sesión</a></li>
                     </ul>
