@@ -13,10 +13,10 @@ int dimX = 30;
 int dimY = 70;
 
 //Origen de la pizarra
-int orgX = 110; //SUJETO A CAMBIOS
-int orgY = -35; //SUJETO A CAMBIOS
+int orgX = 110; 
+int orgY = -35; 
 
-//
+//Parámetros del dibujo
 int dibujoX;
 int dibujoY;
 int dibujoTamanio;

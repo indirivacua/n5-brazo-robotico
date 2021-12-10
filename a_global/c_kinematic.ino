@@ -120,19 +120,23 @@ void dibujarSegmento(double p1x, double p1y, double p2x, double p2y, double altu
 
 void dibujarCuadrado(int xc, int yc, int tam) {
   double tam2 = tam/2;
-  dibujarSegmento(xc - tam2, yc + tam2, xc - tam2, yc - tam2, LP);
-  dibujarSegmento(xc - tam2, yc - tam2, xc + tam2, yc - tam2, LP);
-  dibujarSegmento(xc + tam2, yc - tam2, xc + tam2, yc + tam2, LP);
-  dibujarSegmento(xc + tam2, yc + tam2, xc - tam2, yc + tam2, LP);
+  for(int i = 0; i < 2; i++){
+    dibujarSegmento(xc - tam2, yc + tam2, xc - tam2, yc - tam2, LP);
+    dibujarSegmento(xc - tam2, yc - tam2, xc + tam2, yc - tam2, LP);
+    dibujarSegmento(xc + tam2, yc - tam2, xc + tam2, yc + tam2, LP);
+    dibujarSegmento(xc + tam2, yc + tam2, xc - tam2, yc + tam2, LP);
+  }
   servosReposo(50);
 }
 
 void dibujarTriangulo(int xc, int yc, int tam) {
   double tam2 = tam/2;
   double h2 = sqrt(3) *  tam/4;
-  dibujarSegmento(xc - h2, yc + tam2, xc - h2, yc - tam2, LP);
-  dibujarSegmento(xc - h2, yc - tam2, xc + h2, yc, LP);
-  dibujarSegmento(xc + h2, yc, xc - h2, yc + tam2, LP);
+  for(int i = 0; i<2; i++){
+    dibujarSegmento(xc - h2, yc + tam2, xc - h2, yc - tam2, LP);
+    dibujarSegmento(xc - h2, yc - tam2, xc + h2, yc, LP);
+    dibujarSegmento(xc + h2, yc, xc - h2, yc + tam2, LP);
+  }
   servosReposo(50);
 }
 
