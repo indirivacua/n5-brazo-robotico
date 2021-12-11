@@ -14,10 +14,13 @@ void setup(){
 void loop(){
   //Atender requests del servidor web
   server.handleClient();
+
+  //De haber un dibujo pendiente realizarlo
   if (!armAvailable){
-    
+    //Desplazar centro según el origen
     dibujoX += orgX;
     dibujoY += orgY;
+    //Realizar dibujo correspondiente
     if (dibujoTipo == "circle"){
       dibujarCirculo(dibujoX,dibujoY,LP,dibujoTamanio);
     } else if (dibujoTipo == "square"){
@@ -25,6 +28,7 @@ void loop(){
     } else if (dibujoTipo == "triangle"){
       dibujarTriangulo(dibujoX,dibujoY,dibujoTamanio);
     }
+    //Indicar que se realizó el dibujo
     armAvailable = true;
   }
 }
