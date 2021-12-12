@@ -6,32 +6,52 @@ BRD - Página Principal
 
 {% block content %}
 <br>
-<h3 class="text-center">ÚLTIMOS DIBUJOS REALIZADOS POR LA COMUNIDAD</h3>
+<h3 class="text-center">DIBUJOS REALIZADOS POR LA COMUNIDAD</h3>
 <br>
-<table class="table table-striped" style="color:white;">
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Usuario</th>
-      <th scope="col">Figura</th>
-      <th scope="col">Fecha</th>
-      <th scope="col">Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for item in drawings %}
+
+<div class="container">
+  <table class="table table-bordered" style="color:white; text-align:center">
+    <thead align="center">
       <tr>
-        <th scope="row">{{item.id}}</th>
-        <td>{{item.user_id}}</td>
-        <td>{{item.type}}</td>
-        <td>{{item.created_date}}</td>
-        <td>
-          <form method="post" action="#">
-            <button type="submit" class="btn btn-warning" name="form-submit-board" value="{{item.id}}">Verlo en la pizarra</button>
-          </form>
-        </td>
+        <th style="vertical-align:middle;" scope="col">Usuario</th>
+        <th style="vertical-align:middle;" scope="col">Figura</th>
+        <th style="vertical-align:middle;" scope="col">Dimensiones</th>
+        <th style="vertical-align:middle;" scope="col">Fecha</th>
+        <th style="vertical-align:middle;" scope="col">Acciones</th>
       </tr>
-    {% endfor %}
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      {% for item in drawings %}
+        <tr style="background-color:white; color:black">
+          <td style="vertical-align:middle;">
+            <img src="{{ current_user.pfp }}" alt="" width="35" height="35" class="pfp d-inline-block align-text-top">
+            {{item.user_id}}
+          </td>
+          <td style="vertical-align:middle;">
+            {% if item.type == 'circle' %}
+              Círculo
+            {% elif item.type == 'square' %}
+              Cuadrado
+            {% elif item.type == 'triangle' %}
+              Triángulo
+            {% endif %}
+          </td>
+          <td style="vertical-align:middle;">
+            {% if item.type == 'circle' %}
+              Radio = {{item.size}}
+            {% else %}
+              Lados = {{item.size}}
+            {% endif %}
+          </td>
+          <td style="vertical-align:middle;">{{item.created_date}}</td>
+          <td style="vertical-align:middle;">
+            <form method="post">
+              <button type="submit" class="btn btn-primary" name="form-submit-board" value="{{item.id}}">Ver en pizarra</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}

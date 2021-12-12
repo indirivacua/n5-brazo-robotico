@@ -22,8 +22,7 @@
                 <img src="{{ url_for('static', filename='images/Industry-Robot-icon.png') }}" alt="" width="30" height="30" class="d-inline-block align-text-top">
                 BRD
             </a>
-
-            {% if request.endpoint == 'root_page' or request.endpoint == 'login_page' or request.endpoint == 'register_page' %}
+            {% if request.endpoint == 'root_page' %}
             <ul class="nav justify-content-end">
                 <li class="nav-item">
                     <a href="{{ url_for('register_page') }}" class="btn btn-primary mr-2">Registrarse</a>
@@ -32,12 +31,8 @@
                     <a href="{{ url_for('login_page') }}" class="btn btn-secondary">Iniciar Sesión</a>
                 </li>
             </ul>
-            {% else %}
+            {% elif request.endpoint != 'register_page' and request.endpoint != 'login_page' %}
             <ul class="nav justify-content-end">
-                <form class="form-inline my-2 my-lg-0 mr-2">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Nombre de usuario" aria-label="Search">
-                    <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Buscar dibujos</button>
-                </form>
                 <li class="nav-item">
                     <a href="{{ url_for('board_page') }}" class="btn btn-primary mr-2">Ir a Pizarra</a>
                 </li>
@@ -48,11 +43,12 @@
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                         <li><a class="dropdown-item" href="{{ url_for('mydrawings_page') }}">Mis dibujos</a></li>
                         <li><a class="dropdown-item" href="{{ url_for('settings_page') }}">Configuración</a></li>
-                        <li><a class="dropdown-item" href="{{ url_for('logout_page') }}">Cerrar sesión</a></li>
+                        <div role="separator" class="dropdown-divider"></div>
+                        <li><a class="dropdown-item" style="color:red;" href="{{ url_for('logout_page') }}">Cerrar sesión</a></li>
                     </ul>
                 </div>
                 <li class="nav-item">
-                    <img src="{{ url_for('static', filename='images/default.jpg') }}" alt="" width="35" height="35" class="pfp d-inline-block align-text-top">
+                    <img src="{{ current_user.pfp }}" alt="" width="35" height="35" class="pfp d-inline-block align-text-top">
                 </li>
             </ul>
             {% endif %}
@@ -93,6 +89,7 @@
     </div>
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
+    </button>
 </div>
 {% endfor %}
 {% endif %}
@@ -105,7 +102,7 @@
 <script src="{{ url_for('static', filename='bootstrap/popper.min.js') }}" ></script>
 <script src="{{ url_for('static', filename='bootstrap/bootstrap.min.js') }}" integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT" crossorigin="anonymous"></script>
 <script src="{{ url_for('static', filename='bootstrap/jquery.min.js') }}"></script>
-<!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 </body>
 

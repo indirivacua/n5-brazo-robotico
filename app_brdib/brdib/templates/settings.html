@@ -9,8 +9,7 @@ BRD - Configuración
 <div class="container text-center">
     <h3 class="text-center form-group">CONFIGURACIÓN</h3>
     <h5 class="text-center form-group">EDITAR PERFIL</h5>
-    <br>
-    <form method="PUT" class="form-register" align="center">
+    <form method="POST" class="form-register" align="center">
         {{ form.hidden_tag() }}
         <div class="row">
             <div class="col-3 offset-3">
@@ -20,8 +19,19 @@ BRD - Configuración
             </div>
             <div class="col-3" align="center">
                 Usuario
-                {{ form.username(class="form-control", placeholder="Ingresar nombre de usuario") }}
+                <div class="input-group">
+                    <span class="input-group-text" id="basic-addon1">@</span>
+                    {{ form.username(class="form-control", placeholder="Nombre de usuario") }}
+                </div>
                 <small id="password_help" class="form-text text-muted"> Entre 2 a 15 caracteres.</small>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-6 offset-3" align="center">
+                Enlace a foto de perfil (Opcional)
+                {{ form.pfp(class="form-control", placeholder="https://pagina-web.com/a/b/c.jpg") }}
+                <small id="password_help" class="form-text text-muted"> La imagen debe ser formato .jpeg.</small>
             </div>
         </div>
         <br>
@@ -46,7 +56,8 @@ BRD - Configuración
     <h6>Al eliminar la cuenta, perderá toda su información de contacto y los dibujos realizados.</h6>
     <h6>¿Está seguro que desea eliminar su cuenta de usuario? Esta acción no puede deshacerse.</h6>
     <br>
-    <a href="{{ url_for('unsubscribe_page') }}" class="btn btn-danger mr-2">Eliminar cuenta</a>
+    <a onclick="return confirm('¿Estás seguro que desea eliminar su cuenta? Esta acción no se puede deshacer.')"
+       href="{{ url_for('unsubscribe_page') }}" class="btn btn-danger mr-2">Eliminar cuenta</a>
 
 </div>
 {% endblock %}
