@@ -6,9 +6,9 @@ BRD - Página Principal
 
 {% block content %}
 <br>
-<h3 class="text-center">DIBUJOS REALIZADOS POR LA COMUNIDAD</h3>
+<h3 class="text-center">ÚLTIMOS DIBUJOS REALIZADOS POR LA COMUNIDAD</h3>
 <br>
-
+{% if drawings_exist %}
 <div class="container">
   <table class="table table-bordered" style="color:white; text-align:center">
     <thead align="center">
@@ -53,4 +53,9 @@ BRD - Página Principal
     </tbody>
   </table>
 </div>
+{% else %}
+<div class="container text-center">
+  <h6>No hay dibujos disponibles para mostrar.</h6>
+</div>
+{% endif %}
 {% endblock %}

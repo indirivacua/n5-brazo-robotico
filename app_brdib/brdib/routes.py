@@ -19,6 +19,11 @@ def root_page():
 @app.route('/home', methods=['GET', 'POST'])
 @login_required
 def home_page():
+    drawings_exist = False
+    drawings = Drawing.query.all()
+    #drawings = Drawing.query.order_by(desc(Drawing.created_date)).all()
+    if Drawing.query.first():
+        drawings_exist = True
     if request.method == 'POST':
         if "form-submit-board" in request.form:
             draw_id = request.form["form-submit-board"]                                                                 # Obtiene el valor del atributo "value="
@@ -26,7 +31,7 @@ def home_page():
             #print("FORM BOARD home_page")
             #print(draw.x, draw.y, draw.type, draw.size)
             return redirect(url_for("board_page", posX=draw.x, posY=draw.y, type=draw.type, size=draw.size))            # redirect y no render porque sino se estaría simulando que estamos en board... (no andaría ningún botón)
-    return render_template('home.html', drawings=Drawing.query.all())
+    return render_template('home.html', drawings=drawings, drawings_exist=drawings_exist)
 
 
 # Página de Registro
@@ -78,6 +83,9 @@ def settings_page():
         #print(f'user_to_update.username: {user_to_update.username}')
         #print(f'form.username.data: {form.username.data}')
         if form.username.data != '':
+            drawings_to_update = Drawing.query.filter_by(user_id=session['username']).all()
+            for drawing in drawings_to_update:
+                drawing.user_id = form.username.data
             user_to_update.username = form.username.data
         #print(f'user_to_update.email: {user_to_update.email}')
         #print(f'form.email.data: {form.email.data}')
@@ -86,9 +94,9 @@ def settings_page():
         #if form.pfp.data != '':
             #user_to_update.pfp = form.pfp.data
         user_to_update.password_hash = bcrypt.generate_password_hash(form.password_ok.data).decode('utf-8')
-        if db.session.commit():
-            session['username'] = form.username.data
-            flash('Perfil modificado exitosamente.', category='info')
+        db.session.commit()
+        session['username'] = user_to_update.username
+        flash('Perfil modificado exitosamente.', category='info')
     if form.errors != {}:
         for error_message in form.errors.values():                                                                      # values() retorna una lista con los elementos del diccionario form.errors
             flash(error_message[0], category="danger")
@@ -178,6 +186,10 @@ def board_page():
 @app.route('/mydrawings', methods=["POST", "GET"])
 @login_required
 def mydrawings_page():
+    drawings_exist = False
+    drawings = Drawing.query.filter_by(user_id=session['username'])
+    if drawings.first():
+        drawings_exist = True
     if request.method == 'POST':
         if "form-submit-board" in request.form:
             draw_id = request.form["form-submit-board"] # obtiene el valor del atributo "value="
@@ -190,4 +202,4 @@ def mydrawings_page():
             Drawing.query.filter_by(id=draw_id).delete()
             db.session.commit()
             flash("Se borró el dibujo correctamente!", category="success")
-    return render_template('mydrawings.html', drawings=Drawing.query.filter_by(user_id=session['username']))
+    return render_template('mydrawings.html', drawings=drawings, drawings_exist=drawings_exist)

@@ -8,7 +8,7 @@ BRD - Página Principal
 <br>
 <h3 class="text-center">MIS DIBUJOS</h3>
 <br>
-
+{% if drawings_exist %}
   <div class="container">
     <table class="table table-bordered" style="color:white; text-align:center">
       <thead align="center">
@@ -53,4 +53,9 @@ BRD - Página Principal
       </tbody>
     </table>
   </div>
+{% else %}
+<div class="container text-center">
+  <h6>Usted no tiene dibujos guardados.</h6>
+</div>
+{% endif %}
 {% endblock %}
