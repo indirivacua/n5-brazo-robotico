@@ -40,11 +40,7 @@ void handleDraw(){
     x=server.arg(0).toInt();
     y=server.arg(1).toInt();
     s=server.arg(3).toInt();
-    //Copiar parámetros
-    dibujoX = x;
-    dibujoY = y;
-    dibujoTamanio = s;
-    dibujoTipo = server.arg(2);
+    
     if(server.arg(2) == "triangle"){
       h2 = sqrt(3) * s/4;
       if(CHECKSIZE) msg = "Espacio insuficiente";
@@ -52,6 +48,7 @@ void handleDraw(){
       {
         msg="Dibujando";
         armAvailable = false; //Indicar que el brazo está ocupado
+        //Dibujar triangulo
       }
     }
     else if(server.arg(2) == "square"){
@@ -61,6 +58,7 @@ void handleDraw(){
       {
         armAvailable = false; //Indicar que el brazo está ocupado
         msg="Dibujando";
+        //Dibujar cuadrado
       }
     }
     else if(server.arg(2) == "circle"){
@@ -70,6 +68,7 @@ void handleDraw(){
       {
         armAvailable = false; //Indicar que el brazo está ocupado
         msg="Dibujando";
+        //Dibujar círculo
       }
     }
     else msg = "La figura indicada no existe";

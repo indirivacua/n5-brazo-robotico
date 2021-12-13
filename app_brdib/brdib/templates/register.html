@@ -20,7 +20,10 @@ BRD - Registrarse
             </div>
             <div class="col-3" align="center">
                 Usuario
-                {{ form.username(class="form-control", placeholder="Ingresar nombre de usuario") }}
+                <div class="input-group">
+                    <span class="input-group-text" id="basic-addon1">@</span>
+                    {{ form.username(class="form-control", placeholder="Nombre de usuario") }}
+                </div>
                 <small id="password_help" class="form-text text-muted"> Entre 2 a 15 caracteres.</small>
             </div>
         </div>
@@ -48,4 +51,3 @@ BRD - Registrarse
 </div>
 
 {% endblock %}
-

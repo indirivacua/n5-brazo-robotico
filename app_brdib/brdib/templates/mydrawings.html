@@ -1,0 +1,61 @@
+{% extends "_base.html" %}
+
+{% block title %}
+BRD - Página Principal
+{% endblock %}
+
+{% block content %}
+<br>
+<h3 class="text-center">MIS DIBUJOS</h3>
+<br>
+{% if drawings_exist %}
+  <div class="container">
+    <table class="table table-bordered" style="color:white; text-align:center">
+      <thead align="center">
+        <tr>
+          <th style="vertical-align:middle;" scope="col">Figura</th>
+          <th style="vertical-align:middle;" scope="col">Dimensiones</th>
+          <th style="vertical-align:middle;" scope="col">Fecha</th>
+          <th style="vertical-align:middle;" scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in drawings %}
+          <tr style="background-color:white; color:black">
+            <td style="vertical-align:middle;">
+              {% if item.type == 'circle' %}
+                Círculo
+              {% elif item.type == 'square' %}
+                Cuadrado
+              {% elif item.type == 'triangle' %}
+                Triángulo
+              {% endif %}
+            </td>
+            <td style="vertical-align:middle;">
+              {% if item.type == 'circle' %}
+                Radio = {{item.size}}
+              {% else %}
+                Lados = {{item.size}}
+              {% endif %}
+            </td>
+            <td style="vertical-align:middle;">{{item.created_date}}</td>
+            <td style="vertical-align:middle;">
+              <form method="post" action="#" style="display: inline-block;">
+                <button type="submit" class="btn btn-primary" name="form-submit-board" value="{{item.id}}">Ver en pizarra</button>
+              </form>
+              <!--<div style="height:5px;font-size:1px;">&nbsp;</div>-->
+              <form method="post" action="#" style="display: inline-block;" onsubmit="return confirm('¿Estás seguro de borrar el dibujo? Esta acción no se puede deshacer.');">
+                <button type="submit" class="btn btn-danger" name="form-submit-delete" value="{{item.id}}">Borrar dibujo</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+<div class="container text-center">
+  <h6>Usted no tiene dibujos guardados.</h6>
+</div>
+{% endif %}
+{% endblock %}
