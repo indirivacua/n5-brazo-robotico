@@ -48,7 +48,7 @@
                     </ul>
                 </div>
                 <li class="nav-item">
-                    <img src="{{ current_user.pfp }}" alt="" width="35" height="35" class="pfp d-inline-block align-text-top">
+                    <img src="{{ url_for('static', filename='pfp/default.jpg') }}" alt="" width="35" height="35" class="pfp d-inline-block align-text-top">
                 </li>
             </ul>
             {% endif %}
@@ -102,7 +102,7 @@
 <script src="{{ url_for('static', filename='bootstrap/popper.min.js') }}" ></script>
 <script src="{{ url_for('static', filename='bootstrap/bootstrap.min.js') }}" integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT" crossorigin="anonymous"></script>
 <script src="{{ url_for('static', filename='bootstrap/jquery.min.js') }}"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
 
 </body>
 

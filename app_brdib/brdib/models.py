@@ -1,6 +1,7 @@
 from brdib import db, login_manager
 from brdib import bcrypt
 from flask_login import UserMixin
+import datetime
 
 
 @login_manager.user_loader
@@ -14,7 +15,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(length=50), nullable=False, unique=True)
     username = db.Column(db.String(length=30), nullable=False, unique=True)
     password_hash = db.Column(db.String(length=60), nullable=False)
-    pfp = db.Column(db.String(length=1500), nullable=False)
+    #pfp = db.Column(db.String(length=80), nullable=False)
     drawings = db.relationship('Drawing', backref='user', lazy=True)
 
     @property
@@ -27,9 +28,6 @@ class User(db.Model, UserMixin):
 
     def check_password_correction(self, attempted_password):
         return bcrypt.check_password_hash(self.password_hash, attempted_password)
-
-
-import datetime
 
 
 # Modelo de tabla de Dibujos
@@ -50,4 +48,5 @@ class Drawing(db.Model):
         self.size = size
         print(self.user_id, self.x, self.y, self.type, self.size, self.created_date)
 
-db.create_all() #AGREGADO
+
+db.create_all()

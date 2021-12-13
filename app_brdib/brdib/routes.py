@@ -1,15 +1,12 @@
 from brdib import app
 from flask import session, request
-from flask_session import Session
 from flask import render_template, redirect, url_for, flash
 from brdib.models import User, Drawing
 from brdib.form import RegisterForm, LoginForm, UpdateForm
 from brdib import db
 from flask_login import login_user, logout_user, login_required
 from brdib import bcrypt
-from sqlalchemy.orm.attributes import flag_modified
 import requests
-
 
 
 # Página Principal (sin sesión activa)
@@ -35,15 +32,12 @@ def home_page():
 # Página de Registro
 @app.route('/register', methods=['GET', 'POST'])
 def register_page():
+    #pfp = ['static/pfp/default.jpg', 'static/pfp/arte.jpg', 'static/pfp/perro.jpg', 'static/pfp/montana.jpg', 'static/pfp/flores.jpg', 'static/pfp/conejo.jpg']
     form = RegisterForm()
     if form.validate_on_submit():
         user_to_create = User(email=form.email.data,
                               username=form.username.data,
                               password=form.password_ok.data)
-        if form.pfp.data != '':
-            user_to_create.pfp = form.pfp.data
-        else:
-            user_to_create.pfp = 'https://www.cs.utexas.edu/~abcs/assets/img/gallery/blank_pfp.jpg'
         db.session.add(user_to_create)
         db.session.commit()
         login_user(user_to_create)
@@ -89,11 +83,11 @@ def settings_page():
         #print(f'form.email.data: {form.email.data}')
         if form.email.data != '':
             user_to_update.email = form.email.data
-        if form.pfp.data != '':
-            user_to_update.pfp = form.pfp.data
+        #if form.pfp.data != '':
+            #user_to_update.pfp = form.pfp.data
         user_to_update.password_hash = bcrypt.generate_password_hash(form.password_ok.data).decode('utf-8')
         if db.session.commit():
-            session['username'] = user_to_update.username
+            session['username'] = form.username.data
             flash('Perfil modificado exitosamente.', category='info')
     if form.errors != {}:
         for error_message in form.errors.values():                                                                      # values() retorna una lista con los elementos del diccionario form.errors
