@@ -40,10 +40,10 @@ BRD - Página Principal
             </td>
             <td style="vertical-align:middle;">{{item.created_date}}</td>
             <td style="vertical-align:middle;">
-              <form method="post">
+              <form method="post" action="#" style="display: inline-block;">
                 <button type="submit" class="btn btn-primary" name="form-submit-board" value="{{item.id}}">Ver en pizarra</button>
               </form>
-              <div style="height:5px;font-size:1px;">&nbsp;</div>
+              <!--<div style="height:5px;font-size:1px;">&nbsp;</div>-->
               <form method="post" action="#" style="display: inline-block;" onsubmit="return confirm('¿Estás seguro de borrar el dibujo? Esta acción no se puede deshacer.');">
                 <button type="submit" class="btn btn-danger" name="form-submit-delete" value="{{item.id}}">Borrar dibujo</button>
               </form>

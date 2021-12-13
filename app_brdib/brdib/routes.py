@@ -133,10 +133,13 @@ def board_page():
             size = request.form["save_size"]
             #print("FORM SAVE board_page")
             #print(int(posX), int(posY), type, int(size))
-            draw = Drawing(session['username'], int(posX), int(posY), type, int(size))
-            db.session.add(draw)
-            db.session.commit()
-            flash("Dibujo guardado correctamente!", category='success')
+            if posX != "":
+                draw = Drawing(session['username'], int(posX), int(posY), type, int(size))
+                db.session.add(draw)
+                db.session.commit()
+                flash("Dibujo guardado correctamente!", category='success')
+            else:
+                flash("No se puede guardar un dibujo vacio!", category="danger")
             return redirect(url_for('board_page')) # agregado para que desaparezcan los parámetros de la url
         elif "form-submit-print" in request.form:
             posX = request.form["print_posX"]
@@ -145,10 +148,13 @@ def board_page():
             size = request.form["print_size"]
             #print("FORM PRINT board_page")
             #print(posX, posY, type, size)
-            draw = Drawing(session['username'], int(posX), int(posY), type, int(size))                                  # Cuando se imprime también se debe guardar
-            db.session.add(draw)
-            db.session.commit()
-            flash("Dibujo guardado correctamente!", category='success')
+            if posX != "":
+                draw = Drawing(session['username'], int(posX), int(posY), type, int(size))                                  # Cuando se imprime también se debe guardar
+                db.session.add(draw)
+                db.session.commit()
+                flash("Dibujo guardado correctamente!", category='success')
+            else:
+                flash("No se puede guardar un dibujo vacio!", category="danger")
             #r = requests.get('http://192.168.4.1/dimensions')
             #print(r.content) #x:30,y:70
             if posX != "":

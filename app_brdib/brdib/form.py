@@ -26,7 +26,7 @@ class RegisterForm(FlaskForm):
 
     '''
     VALIDACION DE LINK DE PFP
-    
+
     def validate_pfp(self, pfp_to_check):
         if pfp_to_check.data != '':
             regex_url = 'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+'
@@ -50,7 +50,7 @@ class UpdateForm(FlaskForm):
     username = StringField(label='Username')
     password_ok = PasswordField(label='Password_ok', validators=[Length(min=8, message="La contraseña debe tener al menos 8 caracteres.")])
     password_ch = PasswordField(label='Password_ch', validators=[EqualTo('password_ok', message="Las contraseñas ingresadas no coinciden.")])
-    pfp = StringField(label='Profile_picture')
+    #pfp = StringField(label='Profile_picture')
     submit = SubmitField(label='Actualizar')
 
     def validate_email(self, email_to_check):
@@ -76,7 +76,7 @@ class UpdateForm(FlaskForm):
 
     '''
     VALIDACION DE LINK DE PFP
-    
+
     def validate_pfp(self, pfp_to_check):
         if pfp_to_check.data != '':
             regex_url = 'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+'

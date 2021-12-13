@@ -24,7 +24,6 @@ BRD - Página Principal
       {% for item in drawings %}
         <tr style="background-color:white; color:black">
           <td style="vertical-align:middle;">
-            <img src="{{ current_user.pfp }}" alt="" width="35" height="35" class="pfp d-inline-block align-text-top">
             {{item.user_id}}
           </td>
           <td style="vertical-align:middle;">
@@ -45,7 +44,7 @@ BRD - Página Principal
           </td>
           <td style="vertical-align:middle;">{{item.created_date}}</td>
           <td style="vertical-align:middle;">
-            <form method="post">
+            <form method="post" action="#">
               <button type="submit" class="btn btn-primary" name="form-submit-board" value="{{item.id}}">Ver en pizarra</button>
             </form>
           </td>
